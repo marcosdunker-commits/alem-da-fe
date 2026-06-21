@@ -17,6 +17,17 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "alem-da-fe-secret-2026")
 
+def _ler_versao():
+    try:
+        with open(os.path.join(os.path.dirname(__file__), "version.txt")) as f:
+            return f.read().strip()
+    except Exception:
+        return "?"
+
+@app.context_processor
+def inject_version():
+    return {"app_version": _ler_versao()}
+
 BRASIL_TZ = ZoneInfo("America/Sao_Paulo")
 VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "")
 VAPID_PRIVATE_KEY = os.path.join(os.path.dirname(__file__), "vapid_private.pem")
