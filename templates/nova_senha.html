@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Além da Fé — Nova Senha</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#e8c46a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="/static/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Montserrat',sans-serif;background:#05080f;color:#f0ead8;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px}
+        .topo{text-align:center;margin-bottom:32px}
+        .topo h1{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,7vw,38px);font-weight:300;color:#f0ead8;letter-spacing:1px}
+        .topo h1 em{font-style:italic;color:#e8c46a;text-shadow:0 0 30px rgba(232,196,106,0.5)}
+        .topo p{font-size:11px;color:rgba(240,234,216,0.45);margin-top:8px;line-height:1.8}
+        .card{width:100%;max-width:400px;background:linear-gradient(160deg,#0e1420,#111827);border:1px solid rgba(201,150,58,0.15);padding:32px 28px;position:relative}
+        .card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(to right,transparent,rgba(201,150,58,0.6),transparent)}
+        .field{margin-bottom:20px}
+        .field label{display:block;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(201,150,58,0.65);margin-bottom:8px}
+        .field input{width:100%;background:rgba(5,8,15,0.7);border:1px solid rgba(201,150,58,0.2);color:#f0ead8;padding:13px 16px;font-family:'Montserrat',sans-serif;font-size:14px;outline:none;transition:.2s}
+        .field input:focus{border-color:rgba(201,150,58,0.7)}
+        .field input::placeholder{color:rgba(240,234,216,0.2);font-weight:300}
+        .mostrar{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+        .mostrar input{accent-color:#e8c46a;width:14px;height:14px;cursor:pointer}
+        .mostrar label{font-size:10px;color:rgba(240,234,216,0.4);cursor:pointer;letter-spacing:1px;text-transform:uppercase;font-weight:600}
+        .btn{width:100%;padding:15px;background:linear-gradient(135deg,#c9963a,#e8c46a);color:#05080f;border:none;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:.2s}
+        .btn:hover{opacity:.85}
+        .erro{background:rgba(180,50,50,0.15);border:1px solid rgba(180,50,50,0.3);color:#ff9090;font-size:11px;padding:10px 14px;margin-bottom:16px;display:none;line-height:1.5}
+    </style>
+</head>
+<body>
+<div class="topo">
+    <h1>Além da <em>Fé</em></h1>
+    <p>Crie sua nova senha.</p>
+</div>
+<div class="card">
+    <div class="erro" id="erro"></div>
+    <div class="field">
+        <label>Nova senha</label>
+        <input type="password" id="senha" placeholder="Mínimo 6 caracteres">
+    </div>
+    <div class="field">
+        <label>Confirmar nova senha</label>
+        <input type="password" id="senha2" placeholder="Repita a senha" onkeydown="if(event.key==='Enter') salvar()">
+    </div>
+    <div class="mostrar">
+        <input type="checkbox" id="ver" onchange="document.getElementById('senha').type=document.getElementById('senha2').type=this.checked?'text':'password'">
+        <label for="ver">Mostrar senha</label>
+    </div>
+    <button class="btn" onclick="salvar()">Salvar nova senha</button>
+</div>
+
+<script>
+async function salvar() {
+    document.getElementById('erro').style.display = 'none';
+    const senha = document.getElementById('senha').value;
+    const senha2 = document.getElementById('senha2').value;
+    if (!senha || !senha2) { document.getElementById('erro').textContent = 'Preencha os dois campos.'; document.getElementById('erro').style.display = 'block'; return; }
+    if (senha !== senha2) { document.getElementById('erro').textContent = 'As senhas não conferem.'; document.getElementById('erro').style.display = 'block'; return; }
+    const r = await fetch('/nova-senha', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({senha}) });
+    const d = await r.json();
+    if (d.ok) { window.location.href = '/'; }
+    else { document.getElementById('erro').textContent = d.erro; document.getElementById('erro').style.display = 'block'; }
+}
+</script>
+</body>
+</html>

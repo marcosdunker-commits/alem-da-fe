@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Além da Fé</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#e8c46a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Além da Fé">
+    <link rel="apple-touch-icon" href="/static/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #05080f;
+            color: #f0ead8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 20px;
+        }
+
+        /* LOGO */
+        .logo-area {
+            text-align: center;
+            margin-bottom: 36px;
+            position: relative;
+        }
+        .logo-area::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle,
+                rgba(232,196,106,0.25) 0%,
+                rgba(201,150,58,0.12) 40%,
+                transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .logo-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 240px; height: 240px;
+            margin-bottom: 16px;
+            z-index: 1;
+        }
+        .logo-ring {
+            position: absolute;
+            width: 196px; height: 196px;
+            border-radius: 50%;
+            border: 2px solid rgba(201,150,58,0.7);
+            box-shadow: 0 0 12px rgba(201,150,58,0.5), inset 0 0 12px rgba(201,150,58,0.15);
+            animation: ring 2.5s ease-in-out infinite;
+        }
+        .logo-ring2 {
+            position: absolute;
+            width: 224px; height: 224px;
+            border-radius: 50%;
+            border: 1px solid rgba(232,196,106,0.35);
+            box-shadow: 0 0 20px rgba(201,150,58,0.25);
+            animation: ring 2.5s ease-in-out infinite 0.6s;
+        }
+        .logo-img {
+            width: 180px; height: 180px;
+            object-fit: contain;
+            position: relative; z-index: 1;
+            animation: pulse 3s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,100% {
+                filter: brightness(1.1) saturate(1.1)
+                    drop-shadow(0 0 12px rgba(201,150,58,0.8))
+                    drop-shadow(0 0 30px rgba(201,150,58,0.5));
+                transform: scale(1);
+            }
+            50% {
+                filter: brightness(2.0) saturate(1.3)
+                    drop-shadow(0 0 24px rgba(255,220,120,1))
+                    drop-shadow(0 0 60px rgba(201,150,58,0.9))
+                    drop-shadow(0 0 100px rgba(201,150,58,0.6));
+                transform: scale(1.05);
+            }
+        }
+        @keyframes ring {
+            0%,100% { opacity: 0.5; transform: scale(1); }
+            50%      { opacity: 1; transform: scale(1.03); }
+        }
+        .logo-area h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(36px, 9vw, 52px);
+            font-weight: 300;
+            color: #f0ead8;
+            line-height: 1.2;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            position: relative; z-index: 1;
+        }
+        .logo-area h1 em {
+            font-style: italic;
+            color: #e8c46a;
+            text-shadow: 0 0 40px rgba(232,196,106,0.5);
+        }
+        .hero-sub {
+            font-size: 11px;
+            font-weight: 400;
+            color: rgba(240,234,216,0.45);
+            line-height: 1.9;
+            letter-spacing: 0.5px;
+            margin: 0 auto 8px;
+            position: relative; z-index: 1;
+        }
+
+        /* CARD */
+        .card {
+            width: 100%;
+            max-width: 400px;
+            background: linear-gradient(160deg, #0e1420, #111827);
+            border: 1px solid rgba(201,150,58,0.15);
+            padding: 32px 28px;
+            position: relative;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(201,150,58,0.6), transparent);
+        }
+
+        /* TABS */
+        .tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            margin-bottom: 28px;
+            border-bottom: 1px solid rgba(201,150,58,0.15);
+        }
+        .tab {
+            padding: 12px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(240,234,216,0.35);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: .2s;
+        }
+        .tab.on { color: #e8c46a; border-bottom-color: #e8c46a; }
+
+        /* FORM */
+        .form { display: none; }
+        .form.on { display: block; }
+
+        .field { margin-bottom: 18px; }
+        .field label {
+            display: block;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(201,150,58,0.65);
+            margin-bottom: 8px;
+        }
+        .field input {
+            width: 100%;
+            background: rgba(5,8,15,0.7);
+            border: 1px solid rgba(201,150,58,0.2);
+            color: #f0ead8;
+            padding: 13px 16px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            outline: none;
+            transition: .2s;
+        }
+        .field input:focus { border-color: rgba(201,150,58,0.7); }
+        .field input::placeholder { color: rgba(240,234,216,0.2); font-weight: 300; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #c9963a, #e8c46a);
+            color: #05080f;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: .2s;
+            margin-top: 4px;
+        }
+        .btn-submit:hover { opacity: 0.85; }
+        .btn-submit:active { transform: scale(.98); }
+
+        .erro {
+            background: rgba(180,50,50,0.15);
+            border: 1px solid rgba(180,50,50,0.3);
+            color: #ff9090;
+            font-size: 11px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            display: none;
+            line-height: 1.5;
+        }
+
+        .rodape {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 10px;
+            color: rgba(240,234,216,0.2);
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="logo-area">
+    <div class="logo-wrap">
+        <div class="logo-ring2"></div>
+        <div class="logo-ring"></div>
+        <img class="logo-img" src="/static/logo.png" alt="Além da Fé">
+    </div>
+    <h1>Além da <em>Fé</em></h1>
+    <p class="hero-sub">Palavra de Deus enviada para você</p>
+</div>
+
+<div class="card">
+    <div class="tabs">
+        <div class="tab on" onclick="trocarTab('login')">Entrar</div>
+        <div class="tab" onclick="trocarTab('cadastro')">Criar conta</div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="form on" id="form-login">
+        <div class="erro" id="erro-login"></div>
+        <div class="field">
+            <label>Email</label>
+            <input type="email" id="l-email" placeholder="seu@email.com">
+        </div>
+        <div class="field">
+            <label>Senha</label>
+            <input type="password" id="l-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter') entrar()">
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+            <input type="checkbox" id="mostrar-senha-login" onchange="document.getElementById('l-senha').type = this.checked ? 'text' : 'password'" style="accent-color:#e8c46a; width:14px; height:14px; cursor:pointer;">
+            <label for="mostrar-senha-login" style="font-size:10px; color:rgba(240,234,216,0.4); cursor:pointer; letter-spacing:1px; text-transform:uppercase; font-weight:600;">Mostrar senha</label>
+        </div>
+        <button class="btn-submit" onclick="entrar()">Entrar</button>
+        <div style="text-align:center; margin-top:14px;">
+            <a href="/esqueci-senha" style="font-size:10px; color:rgba(240,234,216,0.3); text-decoration:none; letter-spacing:1px; font-weight:600; transition:.2s;" onmouseover="this.style.color='#e8c46a'" onmouseout="this.style.color='rgba(240,234,216,0.3)'">Esqueci minha senha</a>
+        </div>
+    </div>
+
+    <!-- CADASTRO -->
+    <div class="form" id="form-cadastro">
+        <div class="erro" id="erro-cadastro"></div>
+        <div class="field">
+            <label>Seu nome</label>
+            <input type="text" id="c-nome" placeholder="Como posso te chamar?">
+        </div>
+        <div class="field">
+            <label>Email</label>
+            <input type="email" id="c-email" placeholder="seu@email.com">
+        </div>
+        <div class="field">
+            <label>Senha</label>
+            <input type="password" id="c-senha" placeholder="Mínimo 6 caracteres">
+        </div>
+        <div class="field">
+            <label>Confirmar senha</label>
+            <input type="password" id="c-senha2" placeholder="Repita a senha" onkeydown="if(event.key==='Enter') cadastrar()">
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <input type="checkbox" id="mostrar-senha" onchange="verSenha(this.checked)" style="accent-color:#e8c46a; width:14px; height:14px; cursor:pointer;">
+            <label for="mostrar-senha" style="font-size:10px; color:rgba(240,234,216,0.4); cursor:pointer; letter-spacing:1px; text-transform:uppercase; font-weight:600;">Mostrar senha</label>
+        </div>
+        <button class="btn-submit" onclick="cadastrar()">Criar minha conta</button>
+    </div>
+</div>
+
+<!-- BANNER INSTALAR APP -->
+<div id="banner-instalar" style="display:none; position:fixed; bottom:0; left:0; right:0; background:linear-gradient(135deg,#0e1420,#111827); border-top:1px solid rgba(201,150,58,0.3); padding:16px 20px; z-index:999; align-items:center; gap:14px;">
+    <img src="/static/logo.png" style="width:40px; height:40px; object-fit:contain; flex-shrink:0;">
+    <div style="flex:1;">
+        <div style="font-size:12px; font-weight:700; color:#f0ead8; margin-bottom:2px;">Além da Fé</div>
+        <div style="font-size:10px; color:rgba(240,234,216,0.4);">Adicionar à tela inicial</div>
+    </div>
+    <button id="btn-instalar" style="padding:10px 18px; background:linear-gradient(135deg,#c9963a,#e8c46a); color:#05080f; border:none; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; white-space:nowrap;">Instalar</button>
+    <button onclick="document.getElementById('banner-instalar').style.display='none'" style="background:none; border:none; color:rgba(240,234,216,0.3); font-size:18px; cursor:pointer; padding:4px; flex-shrink:0;">✕</button>
+</div>
+
+<div class="rodape">
+    © 2026 Além da Fé — Todos os direitos reservados<br>
+    <span style="font-size:9px; letter-spacing:1px;">Desenvolvido por Dunker Technology</span>
+</div>
+
+<script>
+function trocarTab(tab) {
+    document.querySelectorAll('.tab').forEach((t,i) => {
+        t.classList.toggle('on', (tab==='login'&&i===0)||(tab==='cadastro'&&i===1));
+    });
+    document.getElementById('form-login').classList.toggle('on', tab==='login');
+    document.getElementById('form-cadastro').classList.toggle('on', tab==='cadastro');
+}
+
+function mostrarErro(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+async function entrar() {
+    document.getElementById('erro-login').style.display = 'none';
+    const email = document.getElementById('l-email').value.trim();
+    const senha = document.getElementById('l-senha').value;
+    if (!email || !senha) return mostrarErro('erro-login', 'Preencha email e senha.');
+    const r = await fetch('/entrar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email, senha})
+    });
+    const d = await r.json();
+    if (d.ok) { window.location.href = '/home'; }
+    else { mostrarErro('erro-login', d.erro); }
+}
+
+function verSenha(mostrar) {
+    const tipo = mostrar ? 'text' : 'password';
+    document.getElementById('c-senha').type = tipo;
+    document.getElementById('c-senha2').type = tipo;
+}
+
+async function cadastrar() {
+    document.getElementById('erro-cadastro').style.display = 'none';
+    const nome = document.getElementById('c-nome').value.trim();
+    const email = document.getElementById('c-email').value.trim();
+    const senha = document.getElementById('c-senha').value;
+    const senha2 = document.getElementById('c-senha2').value;
+    if (!nome || !email || !senha || !senha2) return mostrarErro('erro-cadastro', 'Preencha todos os campos.');
+    if (senha !== senha2) return mostrarErro('erro-cadastro', 'As senhas não conferem.');
+    const r = await fetch('/registrar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({nome, email, senha})
+    });
+    const d = await r.json();
+    if (d.ok) { window.location.href = '/home'; }
+    else { mostrarErro('erro-cadastro', d.erro); }
+}
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' });
+}
+
+let promptInstalacao = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    promptInstalacao = e;
+    const banner = document.getElementById('banner-instalar');
+    banner.style.display = 'flex';
+});
+
+document.getElementById('btn-instalar').addEventListener('click', async () => {
+    if (!promptInstalacao) return;
+    promptInstalacao.prompt();
+    const { outcome } = await promptInstalacao.userChoice;
+    document.getElementById('banner-instalar').style.display = 'none';
+    promptInstalacao = null;
+});
+
+window.addEventListener('appinstalled', () => {
+    document.getElementById('banner-instalar').style.display = 'none';
+});
+</script>
+</body>
+</html>

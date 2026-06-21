@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Além da Fé</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#e8c46a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Além da Fé">
+    <link rel="apple-touch-icon" href="/static/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #05080f;
+            color: #f0ead8;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── HEADER ── */
+        .hd {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 0 24px;
+            background: linear-gradient(to bottom, rgba(5,8,15,0.95), transparent);
+        }
+        .hd-in {
+            max-width: 480px;
+            margin: 0 auto;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .hd-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            font-weight: 400;
+            color: #f0ead8;
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+        .hd-name b { color: #e8c46a; font-weight: 400; }
+        nav { display: flex; gap: 6px; }
+        nav a {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(240,234,216,0.45);
+            text-decoration: none;
+            padding: 6px 10px;
+            transition: .2s;
+        }
+        nav a:hover, nav a.on { color: #e8c46a; }
+
+        /* ── HERO com logo em destaque ── */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 80px 24px 0px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Brilho de fundo atrás da logo */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -65%);
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle,
+                rgba(232,196,106,0.25) 0%,
+                rgba(201,150,58,0.12) 40%,
+                transparent 70%);
+            pointer-events: none;
+        }
+
+        .logo-wrap {
+            position: relative;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Anéis dourados */
+        .logo-ring {
+            position: absolute;
+            width: 196px;
+            height: 196px;
+            border-radius: 50%;
+            border: 2px solid rgba(201,150,58,0.7);
+            box-shadow: 0 0 12px rgba(201,150,58,0.5), inset 0 0 12px rgba(201,150,58,0.15);
+            animation: ring 2.5s ease-in-out infinite;
+        }
+        .logo-ring2 {
+            position: absolute;
+            width: 224px;
+            height: 224px;
+            border-radius: 50%;
+            border: 1px solid rgba(232,196,106,0.35);
+            box-shadow: 0 0 20px rgba(201,150,58,0.25);
+            animation: ring 2.5s ease-in-out infinite 0.6s;
+        }
+        .logo-ring3 {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 1px solid rgba(201,150,58,0.12);
+            animation: ring 2.5s ease-in-out infinite 1.2s;
+        }
+
+        @keyframes ring {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.03); }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                filter:
+                    brightness(1.1) saturate(1.1)
+                    drop-shadow(0 0 12px rgba(201,150,58,0.8))
+                    drop-shadow(0 0 30px rgba(201,150,58,0.5));
+                transform: scale(1);
+            }
+            50% {
+                filter:
+                    brightness(2.0) saturate(1.3)
+                    drop-shadow(0 0 24px rgba(255,220,120,1))
+                    drop-shadow(0 0 60px rgba(201,150,58,0.9))
+                    drop-shadow(0 0 100px rgba(201,150,58,0.6));
+                transform: scale(1.05);
+            }
+        }
+
+        .logo-img {
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+
+        .hero-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            width: 100%;
+            max-width: 280px;
+        }
+        .hero-divider::before, .hero-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(201,150,58,0.5));
+        }
+        .hero-divider::after {
+            background: linear-gradient(to left, transparent, rgba(201,150,58,0.5));
+        }
+        .hero-divider span {
+            font-size: 12px;
+            color: rgba(201,150,58,0.7);
+            letter-spacing: 3px;
+        }
+
+        .hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(36px, 9vw, 52px);
+            font-weight: 300;
+            color: #f0ead8;
+            line-height: 1.2;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        .hero h1 em {
+            font-style: italic;
+            color: #e8c46a;
+            text-shadow: 0 0 40px rgba(232,196,106,0.5);
+        }
+
+        .hero-sub {
+            font-size: 11px;
+            font-weight: 400;
+            color: rgba(240,234,216,0.45);
+            line-height: 1.9;
+            letter-spacing: 0.5px;
+            max-width: 260px;
+            margin: 0 auto 36px;
+        }
+
+        .btn-cta {
+            padding: 15px 40px;
+            border: 1px solid rgba(201,150,58,0.6);
+            background: transparent;
+            color: #e8c46a;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: .3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-cta::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #c9963a, #e8c46a);
+            opacity: 0;
+            transition: .3s;
+        }
+        .btn-cta:hover::after { opacity: 1; }
+        .btn-cta:hover { color: #05080f; }
+        .btn-cta span { position: relative; z-index: 1; }
+
+        /* Scroll indicator */
+        .scroll-down {
+            position: absolute;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            opacity: 0.35;
+        }
+        .scroll-down span {
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #e8c46a;
+        }
+        .scroll-line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, #e8c46a, transparent);
+            animation: scrollAnim 1.5s ease-in-out infinite;
+        }
+        @keyframes scrollAnim {
+            0% { opacity: 1; transform: scaleY(1); }
+            100% { opacity: 0; transform: scaleY(0.3); }
+        }
+
+        /* ── SEÇÃO MENSAGEM ── */
+        .section {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .section-header::before, .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(201,150,58,0.15);
+        }
+        .section-header span {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(201,150,58,0.6);
+            white-space: nowrap;
+        }
+
+        /* CARD */
+        .msg-card {
+            background: linear-gradient(160deg, #0e1420 0%, #111827 100%);
+            border: 1px solid rgba(201,150,58,0.15);
+            position: relative;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .msg-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(201,150,58,0.6), transparent);
+        }
+
+        /* Logo como marca d'água no card */
+        .card-watermark {
+            position: absolute;
+            right: -10px;
+            bottom: -10px;
+            width: 120px;
+            height: 120px;
+            opacity: 0.04;
+            pointer-events: none;
+        }
+
+        .msg-meta {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(201,150,58,0.08);
+        }
+        .msg-period {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: rgba(201,150,58,0.7);
+        }
+        .msg-ref {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 13px;
+            font-style: italic;
+            color: rgba(240,234,216,0.4);
+        }
+
+        .msg-body { padding: 28px 24px 24px; position: relative; }
+
+        .verse {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(20px, 5.5vw, 26px);
+            font-style: italic;
+            font-weight: 300;
+            color: #f0ead8;
+            line-height: 1.6;
+            margin-bottom: 22px;
+            text-shadow: 0 2px 30px rgba(240,234,216,0.08);
+        }
+
+        .refl {
+            font-size: 13px;
+            font-weight: 300;
+            color: rgba(240,234,216,0.55);
+            line-height: 1.95;
+            margin-bottom: 22px;
+            padding-left: 14px;
+            border-left: 1px solid rgba(201,150,58,0.3);
+        }
+
+        .enc {
+            font-size: 13px;
+            font-weight: 500;
+            color: #e8c46a;
+            line-height: 1.7;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        /* BOTÕES */
+        .btns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: .25s;
+            border: none;
+            display: block;
+        }
+        .btn-gold {
+            background: linear-gradient(135deg, #c9963a, #e8c46a);
+            color: #05080f;
+        }
+        .btn-gold:hover { opacity: 0.85; }
+        .btn-ghost {
+            background: transparent;
+            color: rgba(240,234,216,0.6);
+            border: 1px solid rgba(240,234,216,0.15);
+        }
+        .btn-ghost:hover { border-color: rgba(201,150,58,0.4); color: #e8c46a; }
+        .btn:active { transform: scale(.98); }
+
+        /* PERÍODOS */
+        .period-box {
+            background: linear-gradient(160deg, #0e1420, #111827);
+            border: 1px solid rgba(201,150,58,0.12);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .period-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(201,150,58,0.4), transparent);
+        }
+        .period-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(201,150,58,0.55);
+            margin-bottom: 14px;
+        }
+        .period-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+        .period-a {
+            border: 1px solid rgba(201,150,58,0.12);
+            padding: 14px 6px;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            transition: .2s;
+        }
+        .period-a:hover, .period-a.on {
+            border-color: rgba(201,150,58,0.5);
+            background: rgba(201,150,58,0.05);
+        }
+        .period-a .pl {
+            font-size: 11px;
+            font-weight: 700;
+            color: #f0ead8;
+            letter-spacing: 1px;
+        }
+        .period-a .ph { font-size: 9px; color: rgba(240,234,216,0.35); letter-spacing: 0.5px; }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid rgba(201,150,58,0.1);
+            padding: 36px 20px 28px;
+        }
+        .ft-in { max-width: 480px; margin: 0 auto; }
+        .ft-logo-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .ft-logo-area img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            opacity: 0.7;
+            filter: drop-shadow(0 0 8px rgba(201,150,58,0.3));
+        }
+        .ft-logo-area .ft-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #f0ead8;
+            letter-spacing: 2px;
+        }
+        .ft-logo-area .ft-name b { color: #e8c46a; font-weight: 400; }
+        .ft-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(201,150,58,0.06);
+        }
+        .ft-desc { font-size: 11px; color: rgba(240,234,216,0.3); line-height: 1.7; max-width: 180px; font-weight: 300; }
+        .ft-links h4 {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: rgba(201,150,58,0.5);
+            margin-bottom: 10px;
+        }
+        .ft-links a {
+            display: block;
+            font-size: 11px;
+            color: rgba(240,234,216,0.35);
+            text-decoration: none;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            transition: .2s;
+        }
+        .ft-links a:hover { color: #e8c46a; }
+        .ft-copy { text-align: center; font-size: 10px; color: rgba(240,234,216,0.15); letter-spacing: 1px; }
+
+        /* OVERLAY */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5,8,15,0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            backdrop-filter: blur(12px);
+            padding: 20px;
+        }
+        .overlay.hidden { display: none; }
+        .load-box {
+            background: #0e1420;
+            border: 1px solid rgba(201,150,58,0.2);
+            padding: 40px 30px;
+            text-align: center;
+            max-width: 280px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .load-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(201,150,58,0.6), transparent);
+        }
+        .load-box h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #f0ead8;
+            margin-bottom: 8px;
+        }
+        .load-box p { font-size: 11px; color: rgba(240,234,216,0.4); line-height: 1.6; margin-bottom: 24px; font-weight: 300; }
+        .spin {
+            width: 28px;
+            height: 28px;
+            border: 1px solid rgba(201,150,58,0.2);
+            border-top-color: #e8c46a;
+            border-radius: 50%;
+            animation: sp .8s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes sp { to { transform: rotate(360deg); } }
+        @keyframes barraPulse {
+            0%,100% { opacity: 0.3; box-shadow: none; width: 160px; }
+            50%      { opacity: 1; box-shadow: 0 0 12px #e8c46a, 0 0 30px rgba(232,196,106,0.8); width: 240px; }
+        }
+    </style>
+</head>
+<body>
+
+{% if trial and dias_restantes > 0 %}
+<div style="background:linear-gradient(135deg,rgba(201,150,58,0.15),rgba(232,196,106,0.08)); border-bottom:1px solid rgba(201,150,58,0.25); padding:9px 20px; text-align:center; position:fixed; top:0; left:0; right:0; z-index:200;">
+    <span style="font-size:11px; color:#e8c46a; font-weight:600; letter-spacing:0.5px;">
+        Teste grátis — <strong>{{ dias_restantes }} dia{{ 's' if dias_restantes != 1 else '' }}</strong> restante{{ 's' if dias_restantes != 1 else '' }}
+    </span>
+    <button onclick="mostrarPremium()" style="margin-left:12px; background:linear-gradient(135deg,#c9963a,#e8c46a); color:#05080f; border:none; font-family:'Montserrat',sans-serif; font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:5px 12px; cursor:pointer;">Assinar agora</button>
+</div>
+{% endif %}
+
+<!-- HEADER -->
+<header class="hd" style="{{ 'top:36px;' if trial and dias_restantes > 0 else '' }}">
+    <div class="hd-in">
+        <a href="/" class="hd-name">Além da <b>Fé</b></a>
+        <nav>
+            <a href="/logout">Sair</a>
+        </nav>
+    </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="logo-wrap">
+        <div class="logo-ring2"></div>
+        <div class="logo-ring"></div>
+        <img class="logo-img" src="/static/logo.png" alt="Além da Fé">
+    </div>
+
+    <div class="hero-divider"><span>✦</span></div>
+
+    <h1>Além da <em>Fé</em></h1>
+    <p class="hero-sub">Palavra de Deus enviada para você</p>
+
+
+</section>
+
+<div style="display:flex; justify-content:center; margin: 12px 0 24px 0;">
+    <div style="width:200px; height:2px; background:linear-gradient(to right, transparent, #e8c46a, transparent); animation: barraPulse 1.5s ease-in-out infinite;"></div>
+</div>
+
+<!-- MENSAGEM -->
+<div class="section">
+    <div class="msg-card">
+        <img class="card-watermark" src="/static/logo.png" alt="">
+        <div class="msg-meta">
+            <span class="msg-period" id="periodo-label">Mensagem para você, {{ nome.split()[0] }}</span>
+            <span class="msg-ref" id="ref">{{ mensagem.versiculo }}</span>
+        </div>
+        <div class="msg-body">
+            <p class="verse" id="verse">"{{ mensagem.texto_versiculo }}"</p>
+            <p class="refl" id="refl">{{ mensagem.reflexao }}</p>
+            <p class="enc" id="enc">{{ mensagem.encorajamento }}</p>
+        </div>
+    </div>
+
+    <div class="btns">
+        {% if plano == 'premium' %}
+        <button class="btn btn-gold" onclick="pedirMensagem()">Receber nova mensagem</button>
+        {% else %}
+        <button class="btn btn-gold" onclick="mostrarPremium()">Receber nova mensagem</button>
+        {% endif %}
+        <a href="/cadastro" class="btn btn-ghost">Cadastro de mensagem diária</a>
+        <button class="btn btn-ghost" onclick="compartilhar()">Compartilhar</button>
+        <button class="btn btn-ghost" id="btn-notif" onclick="ativarNotificacoes()" style="display:none;">Ativar notificações</button>
+    </div>
+
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="ft-in" style="text-align:center;">
+        <div class="ft-copy" style="font-family:'Cormorant Garamond',serif; font-size:13px; color:rgba(240,234,216,0.25); letter-spacing:2px; line-height:2;">
+            Além da Fé<br>
+            <span style="font-size:10px; font-family:'Montserrat',sans-serif;">© 2026 Além da Fé — Todos os direitos reservados</span><br>
+            <span style="font-size:9px; font-family:'Montserrat',sans-serif; letter-spacing:1px;">Desenvolvido por Dunker Technology</span>
+        </div>
+    </div>
+</footer>
+
+<!-- MODAL PREMIUM -->
+<div id="modal-premium" style="display:none; position:fixed; inset:0; background:rgba(5,8,15,0.92); z-index:998; backdrop-filter:blur(12px); align-items:center; justify-content:center; padding:20px;">
+    <div style="background:linear-gradient(160deg,#0e1420,#111827); border:1px solid rgba(201,150,58,0.25); max-width:360px; width:100%; padding:36px 28px; text-align:center; position:relative;">
+        <div style="position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(to right,transparent,rgba(201,150,58,0.7),transparent);"></div>
+
+        <p style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(201,150,58,0.6);margin-bottom:14px;">Versão Premium</p>
+
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#f0ead8;line-height:1.3;margin-bottom:8px;">Eleve sua <em style="font-style:italic;color:#e8c46a;">experiência</em></h2>
+
+        <p style="font-size:12px;color:rgba(240,234,216,0.45);line-height:1.9;margin-bottom:24px;font-weight:300;">Receba mensagens bíblicas a qualquer momento,<br>sempre que precisar de uma palavra de fé.</p>
+
+        <div style="background:rgba(201,150,58,0.06);border:1px solid rgba(201,150,58,0.15);padding:16px;margin-bottom:24px;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(201,150,58,0.5);margin-bottom:10px;">O que você ganha</div>
+            <div style="font-size:12px;color:rgba(240,234,216,0.6);line-height:2;font-weight:300;">
+                Mensagens ilimitadas sob demanda<br>
+                Cadastro de até 3 horários diários<br>
+                Apoie esta missão de fé
+            </div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <div style="font-size:28px;font-weight:700;color:#e8c46a;letter-spacing:1px;">R$ 9,90<span style="font-size:12px;font-weight:400;color:rgba(240,234,216,0.4)">/mês</span></div>
+            <div style="font-size:10px;color:rgba(240,234,216,0.3);margin-top:2px;">ou R$ 69,90/ano — economize 41%</div>
+        </div>
+
+        <button onclick="assinar('mensal')" style="width:100%;padding:15px;background:linear-gradient(135deg,#c9963a,#e8c46a);color:#05080f;border:none;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;margin-bottom:10px;">Assinar por R$ 9,90/mês</button>
+        <button onclick="assinar('anual')" style="width:100%;padding:13px;background:transparent;border:1px solid rgba(201,150,58,0.4);color:#e8c46a;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-bottom:16px;">Plano anual — R$ 69,90 (economize 41%)</button>
+
+        <button onclick="fecharPremium()" style="background:none;border:none;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(240,234,216,0.25);cursor:pointer;">Agora não</button>
+    </div>
+</div>
+
+<!-- MODAL COMPARTILHAR -->
+<div id="modal-share" style="display:none; position:fixed; inset:0; background:rgba(5,8,15,0.95); z-index:998; backdrop-filter:blur(12px); align-items:flex-start; justify-content:center; padding:20px; overflow-y:auto;">
+    <div style="background:linear-gradient(160deg,#0e1420,#111827); border:1px solid rgba(201,150,58,0.2); max-width:400px; width:100%; padding:28px 24px; text-align:center; position:relative; margin: auto;">
+        <div style="position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(to right,transparent,rgba(201,150,58,0.6),transparent);"></div>
+
+        <p style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#f0ead8;margin-bottom:4px;">Compartilhar <em style="font-style:italic;color:#e8c46a;">mensagem</em></p>
+        <p style="font-size:10px;color:rgba(240,234,216,0.3);margin-bottom:20px;letter-spacing:1px;">Salve a imagem e compartilhe</p>
+
+        <!-- PRÉVIA DA IMAGEM -->
+        <canvas id="share-canvas" style="width:100%;border:1px solid rgba(201,150,58,0.15);display:block;margin-bottom:16px;"></canvas>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            <button onclick="compartilharImagem()" style="width:100%;padding:14px;background:#25D366;color:#fff;border:none;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">Compartilhar no WhatsApp</button>
+            <button onclick="baixarImagem()" style="width:100%;padding:14px;background:transparent;border:1px solid rgba(201,150,58,0.3);color:#e8c46a;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">Salvar imagem</button>
+        </div>
+
+        <button onclick="document.getElementById('modal-share').style.display='none'" style="margin-top:16px;background:none;border:none;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(240,234,216,0.25);cursor:pointer;">Fechar</button>
+    </div>
+</div>
+
+<!-- BANNER INSTALAR APP -->
+<div id="banner-instalar" style="display:none; position:fixed; bottom:0; left:0; right:0; background:linear-gradient(135deg,#0e1420,#111827); border-top:1px solid rgba(201,150,58,0.3); padding:16px 20px; z-index:997; align-items:center; gap:14px;">
+    <img src="/static/logo.png" style="width:40px; height:40px; object-fit:contain; flex-shrink:0;">
+    <div style="flex:1;">
+        <div style="font-size:12px; font-weight:700; color:#f0ead8; margin-bottom:2px;">Além da Fé</div>
+        <div style="font-size:10px; color:rgba(240,234,216,0.4);">Adicionar à tela inicial</div>
+    </div>
+    <button id="btn-instalar" style="padding:10px 18px; background:linear-gradient(135deg,#c9963a,#e8c46a); color:#05080f; border:none; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; white-space:nowrap;">Instalar</button>
+    <button onclick="document.getElementById('banner-instalar').style.display='none'" style="background:none; border:none; color:rgba(240,234,216,0.3); font-size:18px; cursor:pointer; padding:4px; flex-shrink:0;">✕</button>
+</div>
+
+<!-- LOADING -->
+<div id="loading" class="overlay hidden">
+    <div class="load-box">
+        <h4>Preparando sua mensagem</h4>
+        <p>Buscando uma palavra especial para você...</p>
+        <div class="spin"></div>
+    </div>
+</div>
+
+<script>
+function mostrarPremium(){
+    document.getElementById('modal-premium').style.display = 'flex';
+}
+function fecharPremium(){
+    document.getElementById('modal-premium').style.display = 'none';
+}
+async function assinar(plano) {
+    const r = await fetch('/criar-pagamento', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({plano})
+    });
+    const d = await r.json();
+    if (d.ok) window.location.href = d.url;
+}
+
+// Mensagem de sucesso após pagamento
+(function() {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('premium') === 'ativado') {
+        const aviso = document.createElement('div');
+        aviso.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(50,180,50,0.15);border:1px solid rgba(50,180,50,0.4);color:#90ff90;padding:12px 24px;font-size:11px;font-weight:600;letter-spacing:1px;text-align:center;z-index:999;max-width:320px;width:90%;';
+        aviso.textContent = 'Bem-vindo ao Premium! Acesso liberado com sucesso.';
+        document.body.appendChild(aviso);
+        setTimeout(() => aviso.remove(), 5000);
+        history.replaceState({}, '', '/home');
+    }
+})();
+
+async function pedirMensagem(){
+    document.getElementById('loading').classList.remove('hidden');
+    try {
+        const r = await fetch('/nova-mensagem');
+        const d = await r.json();
+        document.getElementById('ref').textContent = d.versiculo;
+        document.getElementById('verse').textContent = '"' + d.texto_versiculo + '"';
+        document.getElementById('refl').textContent = d.reflexao;
+        document.getElementById('enc').textContent = d.encorajamento;
+        document.getElementById('periodo-label').textContent = 'Mensagem especial';
+        document.querySelector('.section').scrollIntoView({behavior:'smooth'});
+    } catch(e){ alert('Ops! Tente novamente.'); }
+    finally { document.getElementById('loading').classList.add('hidden'); }
+}
+function compartilhar(){
+    const verso  = document.getElementById('ref').textContent;
+    const texto  = document.getElementById('verse').textContent;
+    const refl   = document.getElementById('refl').textContent;
+    const enc    = document.getElementById('enc').textContent;
+    gerarCanvas(verso, texto, refl, enc);
+    document.getElementById('modal-share').style.display = 'flex';
+}
+
+function gerarCanvas(verso, texto, refl, enc){
+    const canvas = document.getElementById('share-canvas');
+    const W = 1080, H = 1350;
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // Fundo
+    const bg = ctx.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0, '#0a0e1a');
+    bg.addColorStop(1, '#05080f');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0,0,W,H);
+
+    // Borda dourada
+    ctx.strokeStyle = 'rgba(201,150,58,0.4)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(40, 40, W-80, H-80);
+
+    // Linha dourada topo
+    const grad = ctx.createLinearGradient(80,0,W-80,0);
+    grad.addColorStop(0,'transparent');
+    grad.addColorStop(0.5,'rgba(232,196,106,0.9)');
+    grad.addColorStop(1,'transparent');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(80,40); ctx.lineTo(W-80,40); ctx.stroke();
+
+    // Logo
+    const logo = new Image();
+    logo.crossOrigin = 'anonymous';
+    logo.src = '/static/logo.png';
+    logo.onload = function(){
+        // Glow atrás da logo
+        const glow = ctx.createRadialGradient(W/2,180,10,W/2,180,200);
+        glow.addColorStop(0,'rgba(232,196,106,0.3)');
+        glow.addColorStop(1,'transparent');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0,0,W,400);
+
+        // Anel externo
+        ctx.beginPath();
+        ctx.arc(W/2, 190, 145, 0, Math.PI*2);
+        ctx.strokeStyle = 'rgba(201,150,58,0.5)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Anel interno
+        ctx.beginPath();
+        ctx.arc(W/2, 190, 120, 0, Math.PI*2);
+        ctx.strokeStyle = 'rgba(232,196,106,0.3)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.drawImage(logo, W/2-110, 80, 220, 220);
+
+        // Nome do app
+        ctx.font = '300 52px Georgia, serif';
+        ctx.fillStyle = '#f0ead8';
+        ctx.textAlign = 'center';
+        ctx.fillText('Além da Fé', W/2, 370);
+
+        // Tagline
+        ctx.font = '400 22px Montserrat, sans-serif';
+        ctx.fillStyle = 'rgba(201,150,58,0.7)';
+        ctx.fillText('PALAVRA DE DEUS ENVIADA PARA VOCÊ', W/2, 410);
+
+        // Divisor
+        const div = ctx.createLinearGradient(120,0,W-120,0);
+        div.addColorStop(0,'transparent');
+        div.addColorStop(0.5,'rgba(201,150,58,0.6)');
+        div.addColorStop(1,'transparent');
+        ctx.strokeStyle = div;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(120,445); ctx.lineTo(W-120,445); ctx.stroke();
+
+        // Versículo (texto principal)
+        ctx.fillStyle = '#f0ead8';
+        ctx.font = 'italic 300 46px Georgia, serif';
+        wrapText(ctx, texto, W/2, 510, W-160, 68);
+
+        // Referência
+        ctx.font = '400 26px Montserrat, sans-serif';
+        ctx.fillStyle = 'rgba(232,196,106,0.8)';
+        ctx.fillText(verso, W/2, 830);
+
+        // Divisor 2
+        ctx.strokeStyle = div;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(200,870); ctx.lineTo(W-200,870); ctx.stroke();
+
+        // Reflexão
+        ctx.fillStyle = 'rgba(240,234,216,0.55)';
+        ctx.font = '300 30px Montserrat, sans-serif';
+        wrapText(ctx, refl, W/2, 930, W-180, 50);
+
+        // Encorajamento
+        ctx.fillStyle = '#e8c46a';
+        ctx.font = '500 32px Montserrat, sans-serif';
+        wrapText(ctx, enc, W/2, 1180, W-160, 52);
+
+        // Linha fundo
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(80,H-40); ctx.lineTo(W-80,H-40); ctx.stroke();
+    };
+}
+
+function wrapText(ctx, text, x, y, maxW, lineH){
+    const words = text.split(' ');
+    let line = '';
+    for(let i=0; i<words.length; i++){
+        const test = line + words[i] + ' ';
+        if(ctx.measureText(test).width > maxW && i>0){
+            ctx.fillText(line.trim(), x, y);
+            line = words[i] + ' ';
+            y += lineH;
+        } else { line = test; }
+    }
+    ctx.fillText(line.trim(), x, y);
+}
+
+function baixarImagem(){
+    if (!IS_PREMIUM) {
+        document.getElementById('modal-share').style.display = 'none';
+        mostrarPremium();
+        return;
+    }
+    const canvas = document.getElementById('share-canvas');
+    const a = document.createElement('a');
+    a.download = 'alem-da-fe.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+}
+
+function compartilharImagem(){
+    if (!IS_PREMIUM) {
+        document.getElementById('modal-share').style.display = 'none';
+        mostrarPremium();
+        return;
+    }
+    const canvas = document.getElementById('share-canvas');
+    canvas.toBlob(async function(blob){
+        const file = new File([blob], 'alem-da-fe.png', {type:'image/png'});
+        // Tenta Web Share API com imagem (funciona em HTTPS)
+        if(navigator.canShare && navigator.canShare({files:[file]})){
+            try {
+                await navigator.share({files:[file], title:'Além da Fé'});
+                return;
+            } catch(e){}
+        }
+        // Fallback: salva a imagem e abre WhatsApp com texto
+        const a = document.createElement('a');
+        a.download = 'alem-da-fe.png';
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+        setTimeout(() => {
+            window.open('https://wa.me/?text=' + encodeURIComponent('Olha essa palavra de fé que recebi no Além da Fé! 🙏'), '_blank');
+        }, 1000);
+    });
+}
+
+const IS_PREMIUM = {{ 'true' if plano == 'premium' else 'false' }};
+
+// ── PWA + NOTIFICAÇÕES ──────────────────────────────
+const VAPID_PUBLIC_KEY = '{{ vapid_public_key }}';
+
+function urlBase64ToUint8Array(b64) {
+    const pad = '='.repeat((4 - b64.length % 4) % 4);
+    const base64 = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
+    const raw = atob(base64);
+    const arr = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+    return arr;
+}
+
+async function iniciarPWA() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    try {
+        await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        const btn = document.getElementById('btn-notif');
+        if (!sub && Notification.permission !== 'denied') {
+            btn.style.display = 'block';
+        } else if (sub) {
+            btn.style.display = 'block';
+            btn.textContent = 'Notificações ativas';
+            btn.style.opacity = '0.5';
+            btn.disabled = true;
+        }
+    } catch(e) {}
+}
+
+async function ativarNotificacoes() {
+    if (!('serviceWorker' in navigator)) return;
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') return;
+    try {
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+        await fetch('/subscribe-push', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sub)
+        });
+        const btn = document.getElementById('btn-notif');
+        btn.textContent = 'Notificações ativas';
+        btn.style.opacity = '0.5';
+        btn.disabled = true;
+    } catch(e) { console.error('Erro ao ativar notificações:', e); }
+}
+
+iniciarPWA();
+
+let promptInstalacao = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    promptInstalacao = e;
+    document.getElementById('banner-instalar').style.display = 'flex';
+});
+
+document.getElementById('btn-instalar').addEventListener('click', async () => {
+    if (!promptInstalacao) return;
+    promptInstalacao.prompt();
+    const { outcome } = await promptInstalacao.userChoice;
+    document.getElementById('banner-instalar').style.display = 'none';
+    promptInstalacao = null;
+});
+
+window.addEventListener('appinstalled', () => {
+    document.getElementById('banner-instalar').style.display = 'none';
+});
+</script>
+</body>
+</html>

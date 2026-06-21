@@ -1,0 +1,19 @@
+# Segredos e chaves
+.env
+vapid_private.pem
+
+# Banco de dados
+*.db
+*.sqlite
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Sistema
+.DS_Store
+Thumbs.db

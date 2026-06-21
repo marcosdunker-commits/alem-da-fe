@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Além da Fé — {{ mensagem.versiculo }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Além da Fé" class="logo-img">
+            <div class="logo-texto">
+                <h1>Além da Fé</h1>
+                <span>Palavra diária</span>
+            </div>
+        </a>
+        <nav>
+            <a href="/">Início</a>
+            <a href="/mensagem/manha" {% if periodo == 'manha' %}class="ativo"{% endif %}>Manhã</a>
+            <a href="/mensagem/noite" {% if periodo == 'noite' %}class="ativo"{% endif %}>Noite</a>
+        </nav>
+    </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">
+            {% if periodo == 'manha' %}🌅 Mensagem da Manhã
+            {% elif periodo == 'tarde' %}☀️ Mensagem da Tarde
+            {% elif periodo == 'noite' %}🌙 Mensagem da Noite
+            {% else %}✨ Mensagem Especial{% endif %}
+        </div>
+        <h2>Deus tem uma palavra<br>especial para você hoje</h2>
+        <p>Receba com o coração aberto. Essa mensagem foi preparada com muito amor.</p>
+    </div>
+</section>
+
+<!-- MAIN -->
+<main>
+
+    <div class="card-mensagem">
+        <div class="card-topo">
+            <div class="card-periodo">
+                <span class="periodo-emoji">{{ mensagem.emoji }}</span>
+                <div class="periodo-info">
+                    <h3>
+                        {% if periodo == 'manha' %}Bom dia, irmão!
+                        {% elif periodo == 'tarde' %}Boa tarde, irmão!
+                        {% elif periodo == 'noite' %}Boa noite, irmão!
+                        {% else %}Uma palavra para você!{% endif %}
+                    </h3>
+                    <span>Palavra para este momento</span>
+                </div>
+            </div>
+            <div class="versiculo-tag">📖 {{ mensagem.versiculo }}</div>
+        </div>
+        <div class="card-corpo">
+            <div class="linha-divisor"></div>
+            <blockquote class="texto-versiculo">
+                "{{ mensagem.texto_versiculo }}"
+            </blockquote>
+            <p class="reflexao">{{ mensagem.reflexao }}</p>
+            <div class="encorajamento">
+                🙏 {{ mensagem.encorajamento }}
+            </div>
+        </div>
+    </div>
+
+    <div class="botoes-acoes">
+        <button class="btn btn-dourado" onclick="compartilhar()">
+            🤍 Compartilhar essa mensagem
+        </button>
+        <a href="/" class="btn btn-outline">← Voltar ao início</a>
+    </div>
+
+    <div class="secao-periodos">
+        <p class="secao-titulo">Outras mensagens</p>
+        <div class="grid-periodos">
+            <a href="/mensagem/manha" class="card-periodo-btn {% if periodo == 'manha' %}ativo{% endif %}">
+                <span class="emoji">🌅</span>
+                <span class="label">Manhã</span>
+                <span class="hora">6h às 12h</span>
+            </a>
+            <a href="/mensagem/tarde" class="card-periodo-btn {% if periodo == 'tarde' %}ativo{% endif %}">
+                <span class="emoji">☀️</span>
+                <span class="label">Tarde</span>
+                <span class="hora">12h às 18h</span>
+            </a>
+            <a href="/mensagem/noite" class="card-periodo-btn {% if periodo == 'noite' %}ativo{% endif %}">
+                <span class="emoji">🌙</span>
+                <span class="label">Noite</span>
+                <span class="hora">18h às 6h</span>
+            </a>
+        </div>
+    </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-topo">
+            <div class="footer-marca">
+                <h3>✝ Além da Fé</h3>
+                <p>Mensagens bíblicas diárias com amor e em linguagem simples para o seu coração.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Momentos</h4>
+                <a href="/mensagem/manha">🌅 Mensagem da Manhã</a>
+                <a href="/mensagem/tarde">☀️ Mensagem da Tarde</a>
+                <a href="/mensagem/noite">🌙 Mensagem da Noite</a>
+            </div>
+        </div>
+        <div class="footer-base">
+            <p>© 2026 Além da Fé — Feito com amor e fé 🙏</p>
+            <span>Uma palavra para o seu coração todos os dias</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    async function compartilhar() {
+        const versiculo = "{{ mensagem.versiculo }}";
+        const texto = `"{{ mensagem.texto_versiculo }}"`;
+        const reflexao = "{{ mensagem.reflexao }}";
+        const enc = "{{ mensagem.encorajamento }}";
+        const msg = `${texto}\n\n${reflexao}\n\n🙏 ${enc}\n\n📖 ${versiculo}\n\n✝ Além da Fé`;
+        if (navigator.share) {
+            await navigator.share({ text: msg, title: "Além da Fé" });
+        } else {
+            await navigator.clipboard.writeText(msg);
+            alert("Mensagem copiada! Cole onde quiser 💛");
+        }
+    }
+</script>
+
+</body>
+</html>
