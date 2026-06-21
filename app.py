@@ -42,14 +42,14 @@ def get_periodo_atual():
         return "noite"
 
 
-def enviar_push_para_todos(dados):
+def enviar_push_para_todos(periodo):
     try:
         from pywebpush import webpush, WebPushException
         subs = buscar_todas_push_subscriptions()
-        texto_curto = dados.get("texto_versiculo", "")[:80] + "..."
+        saudacoes = {"manha": "Bom dia! ☀️", "tarde": "Boa tarde! 🌤️", "noite": "Boa noite! 🌙"}
         payload = json.dumps({
             "title": "Além da Fé — Mensagem do dia",
-            "body": texto_curto,
+            "body": f"{saudacoes.get(periodo, '✨')} Sua mensagem especial de hoje está pronta.",
             "url": "/home"
         })
         for sub in subs:
@@ -69,20 +69,11 @@ def enviar_push_para_todos(dados):
         print(f"Erro geral no push: {e}")
 
 
-def gerar_e_salvar(tipo, push=False):
-    print(f"Gerando mensagem de {tipo}...")
-    dados = gerar_mensagem(tipo)
-    salvar_mensagem(tipo, dados)
-    print(f"Mensagem de {tipo} salva!")
-    if push:
-        enviar_push_para_todos(dados)
-
-
 def agendar_mensagens():
     scheduler = BackgroundScheduler(timezone=BRASIL_TZ)
-    scheduler.add_job(lambda: gerar_e_salvar("manha", push=True), "cron", hour=7, minute=0)
-    scheduler.add_job(lambda: gerar_e_salvar("tarde"), "cron", hour=12, minute=0)
-    scheduler.add_job(lambda: gerar_e_salvar("noite"), "cron", hour=21, minute=0)
+    scheduler.add_job(lambda: enviar_push_para_todos("manha"), "cron", hour=7, minute=0)
+    scheduler.add_job(lambda: enviar_push_para_todos("tarde"), "cron", hour=12, minute=0)
+    scheduler.add_job(lambda: enviar_push_para_todos("noite"), "cron", hour=21, minute=0)
     scheduler.start()
     return scheduler
 
@@ -222,10 +213,11 @@ def home():
     info = verificar_expiracao(session["usuario_id"])
     session["usuario_plano"] = info["plano"]
     periodo = get_periodo_atual()
-    mensagem = buscar_mensagem_hoje(periodo)
+    uid = session["usuario_id"]
+    mensagem = buscar_mensagem_hoje(periodo, uid)
     if not mensagem:
         mensagem = gerar_mensagem(periodo)
-        salvar_mensagem(periodo, mensagem)
+        salvar_mensagem(periodo, mensagem, uid)
     return render_template("index.html",
                            mensagem=mensagem,
                            periodo=periodo,
@@ -249,7 +241,9 @@ def cadastro():
 def nova_mensagem():
     if session.get("usuario_plano") != "premium":
         return jsonify({"erro": "premium"}), 403
+    uid = session["usuario_id"]
     dados = gerar_mensagem("aleatorio")
+    salvar_mensagem("aleatorio", dados, uid)
     return jsonify(dados)
 
 

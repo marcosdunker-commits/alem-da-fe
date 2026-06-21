@@ -56,6 +56,11 @@ def init_db():
         conn.commit()
     except Exception:
         pass
+    try:
+        c.execute("ALTER TABLE mensagens ADD COLUMN usuario_id INTEGER")
+        conn.commit()
+    except Exception:
+        pass
     c.execute("""
         CREATE TABLE IF NOT EXISTS push_subscriptions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -96,17 +101,17 @@ def fazer_login(email, senha):
     return None
 
 
-def salvar_mensagem(tipo, dados):
+def salvar_mensagem(tipo, dados, usuario_id=None):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
-        INSERT INTO mensagens (data, tipo, versiculo, texto_versiculo, reflexao, encorajamento, emoji)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO mensagens (data, tipo, versiculo, texto_versiculo, reflexao, encorajamento, emoji, usuario_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         str(date.today()), tipo,
         dados.get("versiculo", ""), dados.get("texto_versiculo", ""),
         dados.get("reflexao", ""), dados.get("encorajamento", ""),
-        dados.get("emoji", "✨")
+        dados.get("emoji", "✨"), usuario_id
     ))
     conn.commit()
     conn.close()
@@ -152,14 +157,14 @@ def atualizar_senha(email, nova_senha):
     conn.commit()
     conn.close()
 
-def buscar_mensagem_hoje(tipo):
+def buscar_mensagem_hoje(tipo, usuario_id):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
         SELECT versiculo, texto_versiculo, reflexao, encorajamento, emoji
-        FROM mensagens WHERE data = ? AND tipo = ?
+        FROM mensagens WHERE data = ? AND tipo = ? AND usuario_id = ?
         ORDER BY criado_em DESC LIMIT 1
-    """, (str(date.today()), tipo))
+    """, (str(date.today()), tipo, usuario_id))
     row = c.fetchone()
     conn.close()
     if row:
