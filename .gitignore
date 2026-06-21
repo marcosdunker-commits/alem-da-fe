@@ -1,6 +1,7 @@
 # Segredos e chaves
 .env
 vapid_private.pem
+deploy.py
 
 # Banco de dados
 *.db
