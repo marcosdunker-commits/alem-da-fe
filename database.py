@@ -301,6 +301,19 @@ def buscar_free_com_push():
     conn.close()
     return [r[0] for r in rows]
 
+def buscar_premium_sem_horario_com_push():
+    """Premium que não cadastrou horários → recebe às 7h como padrão."""
+    conn = sqlite3.connect(DB_PATH)
+    rows = conn.execute("""
+        SELECT DISTINCT ps.usuario_id
+        FROM push_subscriptions ps
+        JOIN usuarios u ON u.id = ps.usuario_id
+        WHERE u.plano = 'premium'
+        AND ps.usuario_id NOT IN (SELECT usuario_id FROM horarios_notificacao)
+    """).fetchall()
+    conn.close()
+    return [r[0] for r in rows]
+
 def excluir_push_subscription(endpoint):
     conn = sqlite3.connect(DB_PATH)
     conn.execute("DELETE FROM push_subscriptions WHERE endpoint=?", (endpoint,))

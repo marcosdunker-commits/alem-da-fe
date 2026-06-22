@@ -10,7 +10,8 @@ from database import (init_db, salvar_mensagem, buscar_mensagem_hoje, criar_cont
                       atualizar_senha, salvar_push_subscription, buscar_todas_push_subscriptions,
                       ativar_premium, verificar_expiracao, buscar_usuarios_com_push, buscar_push_do_usuario,
                       excluir_usuario, excluir_push_subscription, excluir_todas_push_do_usuario,
-                      salvar_horarios, buscar_horarios, buscar_premium_com_push_na_hora, buscar_free_com_push)
+                      salvar_horarios, buscar_horarios, buscar_premium_com_push_na_hora, buscar_free_com_push,
+                      buscar_premium_sem_horario_com_push)
 from ai import gerar_mensagem
 from functools import wraps
 
@@ -138,12 +139,13 @@ def enviar_na_hora_atual():
             _enviar_push_para_lista(premium_ids, tipo)
             enviados.update(premium_ids)
 
-        # Às 7h: free users também recebem
+        # Às 7h: free users + premium sem horário cadastrado recebem
         if hora_int == 7:
-            free_ids = [uid for uid in buscar_free_com_push() if uid not in enviados]
-            if free_ids:
-                print(f"[{hora_str}] Enviando para {len(free_ids)} usuário(s) gratuito(s)...")
-                _enviar_push_para_lista(free_ids, "manha")
+            ids_7h = set(buscar_free_com_push()) | set(buscar_premium_sem_horario_com_push())
+            ids_7h = [uid for uid in ids_7h if uid not in enviados]
+            if ids_7h:
+                print(f"[{hora_str}] Enviando para {len(ids_7h)} usuário(s) às 7h...")
+                _enviar_push_para_lista(ids_7h, "manha")
     except Exception as e:
         print(f"Erro no envio horário: {e}")
 
