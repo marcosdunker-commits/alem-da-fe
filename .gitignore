@@ -7,9 +7,6 @@ deploy.py
 *.db
 *.sqlite
 
-# Bíblia (baixada automaticamente, não commitar 4MB)
-biblia.json
-
 # Python
 __pycache__/
 *.py[cod]
