@@ -73,6 +73,13 @@ def init_db():
     except Exception:
         pass
     c.execute("""
+        CREATE TABLE IF NOT EXISTS horarios_notificacao (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER NOT NULL,
+            hora TEXT NOT NULL
+        )
+    """)
+    c.execute("""
         CREATE TABLE IF NOT EXISTS push_subscriptions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTEGER NOT NULL,
@@ -256,6 +263,43 @@ def excluir_usuario(usuario_id):
     conn.execute("DELETE FROM usuarios WHERE id=?", (usuario_id,))
     conn.commit()
     conn.close()
+
+def salvar_horarios(usuario_id, horarios):
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("DELETE FROM horarios_notificacao WHERE usuario_id=?", (usuario_id,))
+    for h in horarios[:3]:
+        conn.execute("INSERT INTO horarios_notificacao (usuario_id, hora) VALUES (?, ?)", (usuario_id, h))
+    conn.commit()
+    conn.close()
+
+def buscar_horarios(usuario_id):
+    conn = sqlite3.connect(DB_PATH)
+    rows = conn.execute("SELECT hora FROM horarios_notificacao WHERE usuario_id=? ORDER BY hora", (usuario_id,)).fetchall()
+    conn.close()
+    return [r[0] for r in rows]
+
+def buscar_premium_com_push_na_hora(hora):
+    conn = sqlite3.connect(DB_PATH)
+    rows = conn.execute("""
+        SELECT DISTINCT ps.usuario_id
+        FROM push_subscriptions ps
+        JOIN usuarios u ON u.id = ps.usuario_id
+        JOIN horarios_notificacao hn ON hn.usuario_id = ps.usuario_id
+        WHERE u.plano = 'premium' AND hn.hora = ?
+    """, (hora,)).fetchall()
+    conn.close()
+    return [r[0] for r in rows]
+
+def buscar_free_com_push():
+    conn = sqlite3.connect(DB_PATH)
+    rows = conn.execute("""
+        SELECT DISTINCT ps.usuario_id
+        FROM push_subscriptions ps
+        JOIN usuarios u ON u.id = ps.usuario_id
+        WHERE u.plano != 'premium'
+    """).fetchall()
+    conn.close()
+    return [r[0] for r in rows]
 
 def excluir_push_subscription(endpoint):
     conn = sqlite3.connect(DB_PATH)

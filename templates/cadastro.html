@@ -11,233 +11,72 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Montserrat', sans-serif; background: #05080f; color: #f0ead8; min-height: 100vh; display: flex; flex-direction: column; }
 
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: #05080f;
-            color: #f0ead8;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .hd {
-            background: rgba(5,8,15,0.95);
-            border-bottom: 1px solid rgba(201,150,58,0.15);
-            padding: 0 20px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .hd-in {
-            max-width: 480px;
-            margin: 0 auto;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .hd-name {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 18px;
-            color: #f0ead8;
-            letter-spacing: 2px;
-            text-decoration: none;
-        }
+        .hd { background: rgba(5,8,15,0.95); border-bottom: 1px solid rgba(201,150,58,0.15); padding: 0 20px; position: sticky; top: 0; z-index: 100; }
+        .hd-in { max-width: 480px; margin: 0 auto; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+        .hd-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #f0ead8; letter-spacing: 2px; text-decoration: none; }
         .hd-name b { color: #e8c46a; font-weight: 400; }
-        .btn-voltar {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: rgba(240,234,216,0.5);
-            text-decoration: none;
-            transition: .2s;
-        }
+        .btn-voltar { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: rgba(240,234,216,0.5); text-decoration: none; }
         .btn-voltar:hover { color: #e8c46a; }
 
-        main {
-            flex: 1;
-            max-width: 480px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 48px 20px 60px;
-        }
+        main { flex: 1; max-width: 480px; width: 100%; margin: 0 auto; padding: 40px 20px 60px; }
 
-        .page-top {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .page-top h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: clamp(30px, 7vw, 38px);
-            font-weight: 400;
-            color: #f0ead8;
-            line-height: 1.3;
-            margin-bottom: 10px;
-        }
+        .page-top { text-align: center; margin-bottom: 36px; }
+        .page-top h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 7vw, 36px); font-weight: 400; color: #f0ead8; margin-bottom: 8px; }
         .page-top h1 em { font-style: italic; color: #e8c46a; }
-        .page-top p {
-            font-size: 12px;
-            font-weight: 300;
-            color: rgba(240,234,216,0.45);
-            line-height: 1.9;
-        }
+        .page-top p { font-size: 12px; font-weight: 300; color: rgba(240,234,216,0.45); line-height: 1.9; }
 
-        .card {
-            background: linear-gradient(160deg, #0e1420, #111827);
-            border: 1px solid rgba(201,150,58,0.15);
-            padding: 32px 28px;
-            position: relative;
-            margin-bottom: 16px;
-        }
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 10%; right: 10%;
-            height: 1px;
-            background: linear-gradient(to right, transparent, rgba(201,150,58,0.6), transparent);
-        }
+        .card { background: linear-gradient(160deg, #0e1420, #111827); border: 1px solid rgba(201,150,58,0.15); padding: 28px 24px; position: relative; margin-bottom: 14px; }
+        .card::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px; background: linear-gradient(to right, transparent, rgba(201,150,58,0.6), transparent); }
 
-        .horario-destaque {
-            text-align: center;
-            padding: 24px 0 20px;
-        }
-        .horario-destaque .hora {
-            font-size: 56px;
-            font-weight: 700;
-            color: #e8c46a;
-            letter-spacing: 4px;
-            line-height: 1;
-            text-shadow: 0 0 30px rgba(232,196,106,0.4);
-        }
-        .horario-destaque .hora-label {
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: rgba(201,150,58,0.5);
-            margin-top: 8px;
-        }
-        .divider {
-            height: 1px;
-            background: linear-gradient(to right, transparent, rgba(201,150,58,0.2), transparent);
-            margin: 24px 0;
-        }
-
-        .status-area {
-            text-align: center;
-            padding: 8px 0 4px;
-        }
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 18px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 24px;
-        }
-        .status-badge.ativo {
-            background: rgba(50,180,50,0.1);
-            border: 1px solid rgba(50,180,50,0.3);
-            color: #90ff90;
-        }
-        .status-badge.inativo {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: rgba(240,234,216,0.35);
-        }
-        .status-badge .dot {
-            width: 7px; height: 7px;
-            border-radius: 50%;
-        }
+        /* STATUS */
+        .status-area { text-align: center; margin-bottom: 20px; }
+        .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        .status-badge.ativo { background: rgba(50,180,50,0.1); border: 1px solid rgba(50,180,50,0.3); color: #90ff90; }
+        .status-badge.inativo { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: rgba(240,234,216,0.35); }
+        .status-badge .dot { width: 7px; height: 7px; border-radius: 50%; }
         .status-badge.ativo .dot { background: #90ff90; box-shadow: 0 0 6px #90ff90; }
         .status-badge.inativo .dot { background: rgba(240,234,216,0.2); }
 
-        .btn-ativar {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #c9963a, #e8c46a);
-            color: #05080f;
-            border: none;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: .2s;
-        }
-        .btn-ativar:hover { opacity: 0.85; }
-        .btn-ativar:active { transform: scale(.98); }
-
-        .btn-desativar {
-            width: 100%;
-            padding: 14px;
-            background: transparent;
-            border: 1px solid rgba(180,50,50,0.4);
-            color: rgba(255,120,120,0.7);
-            font-family: 'Montserrat', sans-serif;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: .2s;
-            margin-top: 10px;
-        }
+        .btn-ativar { width: 100%; padding: 15px; background: linear-gradient(135deg, #c9963a, #e8c46a); color: #05080f; border: none; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: .2s; }
+        .btn-ativar:hover { opacity: .85; }
+        .btn-desativar { width: 100%; padding: 13px; background: transparent; border: 1px solid rgba(180,50,50,0.4); color: rgba(255,120,120,0.7); font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: .2s; margin-top: 10px; }
         .btn-desativar:hover { background: rgba(180,50,50,0.1); color: #ff9090; }
+        .aviso-notif { font-size: 10px; color: rgba(240,234,216,0.3); text-align: center; margin-top: 12px; line-height: 1.8; }
 
-        .aviso {
-            font-size: 10px;
-            color: rgba(240,234,216,0.3);
-            text-align: center;
-            margin-top: 14px;
-            line-height: 1.8;
-            letter-spacing: 0.5px;
-        }
+        /* HORÁRIO FREE */
+        .horario-fixo { text-align: center; padding: 20px 0; }
+        .horario-fixo .hora { font-size: 52px; font-weight: 700; color: #e8c46a; letter-spacing: 4px; text-shadow: 0 0 30px rgba(232,196,106,0.4); }
+        .horario-fixo .hora-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(201,150,58,0.5); margin-top: 8px; }
+        .divider { height: 1px; background: linear-gradient(to right, transparent, rgba(201,150,58,0.2), transparent); margin: 20px 0; }
 
-        .info-card {
-            background: rgba(201,150,58,0.04);
-            border: 1px solid rgba(201,150,58,0.12);
-            padding: 20px 24px;
-            margin-bottom: 16px;
-        }
-        .info-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-        .info-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .info-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
-        .info-text { font-size: 11px; color: rgba(240,234,216,0.5); line-height: 1.7; font-weight: 300; }
-        .info-text strong { color: rgba(240,234,216,0.8); font-weight: 600; }
+        /* SLOTS PREMIUM */
+        .slots-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(201,150,58,0.65); margin-bottom: 14px; display: block; }
+        .slots { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .slot { display: flex; align-items: center; gap: 16px; background: rgba(5,8,15,0.6); border: 1px solid rgba(201,150,58,0.15); padding: 16px 18px; transition: .2s; }
+        .slot.on { border-color: rgba(201,150,58,0.5); background: rgba(201,150,58,0.06); }
+        .slot-num { width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(201,150,58,0.3); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: rgba(201,150,58,0.5); flex-shrink: 0; transition: .2s; }
+        .slot.on .slot-num { background: #e8c46a; border-color: #e8c46a; color: #05080f; }
+        .slot-info { flex: 1; }
+        .slot-info .slot-title { font-size: 11px; font-weight: 600; color: rgba(240,234,216,0.4); letter-spacing: 1px; display: block; margin-bottom: 2px; }
+        .slot.on .slot-info .slot-title { color: #f0ead8; }
+        .slot-info .slot-sub { font-size: 10px; color: rgba(201,150,58,0.5); }
+        .slot input[type="text"] { background: transparent; border: none; border-bottom: 1px solid rgba(201,150,58,0.3); color: #e8c46a; font-family: 'Montserrat', sans-serif; font-size: 15px; font-weight: 700; outline: none; width: 70px; text-align: center; padding: 2px 0; }
+        .slot input::placeholder { color: rgba(201,150,58,0.3); font-weight: 400; font-size: 13px; }
+        .btn-salvar { width: 100%; padding: 15px; background: linear-gradient(135deg, #c9963a, #e8c46a); color: #05080f; border: none; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: .2s; }
+        .btn-salvar:hover { opacity: .85; }
 
-        .msg {
-            padding: 12px 16px;
-            font-size: 11px;
-            margin-bottom: 16px;
-            display: none;
-            text-align: center;
-        }
+        /* PREMIUM CTA */
+        .premium-cta { background: rgba(201,150,58,0.04); border: 1px solid rgba(201,150,58,0.15); padding: 24px; text-align: center; margin-bottom: 14px; }
+        .premium-cta p { font-size: 12px; color: rgba(240,234,216,0.5); line-height: 1.9; font-weight: 300; margin-bottom: 16px; }
+        .btn-premium { display: inline-block; padding: 12px 28px; background: linear-gradient(135deg, #c9963a, #e8c46a); color: #05080f; border: none; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+
+        .msg { padding: 12px 16px; font-size: 11px; margin-bottom: 14px; display: none; text-align: center; }
         .msg.ok { background: rgba(50,180,50,0.1); border: 1px solid rgba(50,180,50,0.3); color: #90ff90; }
         .msg.err { background: rgba(180,50,50,0.1); border: 1px solid rgba(180,50,50,0.3); color: #ff9090; }
 
-        footer {
-            border-top: 1px solid rgba(201,150,58,0.08);
-            padding: 20px;
-            text-align: center;
-            font-size: 10px;
-            color: rgba(240,234,216,0.15);
-            letter-spacing: 1px;
-        }
-
-        #area-sem-suporte { display: none; }
+        footer { border-top: 1px solid rgba(201,150,58,0.08); padding: 20px; text-align: center; font-size: 10px; color: rgba(240,234,216,0.15); letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -252,19 +91,17 @@
 <main>
     <div class="page-top">
         <h1>Notificações <em>diárias</em></h1>
+        {% if plano == 'premium' %}
+        <p>Escolha até 3 horários para receber<br>sua palavra de fé todos os dias.</p>
+        {% else %}
         <p>Receba sua palavra de fé todos os dias<br>diretamente no seu celular.</p>
+        {% endif %}
     </div>
 
     <div class="msg" id="msg"></div>
 
+    <!-- CARD NOTIFICAÇÕES (todos) -->
     <div class="card">
-        <div class="horario-destaque">
-            <div class="hora">07:00</div>
-            <div class="hora-label">Horário de envio — todos os dias</div>
-        </div>
-
-        <div class="divider"></div>
-
         <div class="status-area">
             <div class="status-badge inativo" id="status-badge">
                 <span class="dot"></span>
@@ -274,41 +111,88 @@
 
         <div id="area-ativar">
             <button class="btn-ativar" id="btn-ativar" onclick="ativar()">Ativar notificações</button>
-            <p class="aviso">Você precisará permitir notificações no seu navegador.</p>
+            <p class="aviso-notif">Você precisará permitir notificações no seu navegador.</p>
         </div>
-
         <div id="area-ativo" style="display:none;">
             <button class="btn-desativar" onclick="desativar()">Desativar notificações</button>
         </div>
-
-        <div id="area-sem-suporte">
-            <p class="aviso" style="margin-top:0; color:rgba(255,150,150,0.6);">
-                Seu navegador não suporta notificações push.<br>
-                Tente abrir o app pelo Chrome ou Safari.
-            </p>
+        <div id="area-sem-suporte" style="display:none;">
+            <p class="aviso-notif" style="color:rgba(255,150,150,0.6);">Seu navegador não suporta notificações push.<br>Tente abrir pelo Chrome.</p>
         </div>
     </div>
 
-    <div class="info-card">
-        <div class="info-item">
-            <span class="info-icon">🕖</span>
-            <span class="info-text"><strong>Todo dia às 7h da manhã</strong> você recebe uma mensagem bíblica personalizada com versículo, reflexão e encorajamento.</span>
+    {% if plano == 'premium' %}
+    <!-- CARD HORÁRIOS PREMIUM -->
+    <div class="card">
+        <span class="slots-label">Seus horários de envio</span>
+        <div class="slots">
+            <div class="slot" id="slot1">
+                <div class="slot-num">1</div>
+                <div class="slot-info">
+                    <span class="slot-title" id="t1">Primeiro horário</span>
+                    <span class="slot-sub">Obrigatório</span>
+                </div>
+                <input type="text" id="h1" placeholder="07:00" maxlength="5" oninput="mascara(this)" onblur="preencher(1,this.value)">
+            </div>
+            <div class="slot" id="slot2">
+                <div class="slot-num">2</div>
+                <div class="slot-info">
+                    <span class="slot-title" id="t2">Segundo horário</span>
+                    <span class="slot-sub">Opcional</span>
+                </div>
+                <input type="text" id="h2" placeholder="12:00" maxlength="5" oninput="mascara(this)" onblur="preencher(2,this.value)">
+            </div>
+            <div class="slot" id="slot3">
+                <div class="slot-num">3</div>
+                <div class="slot-info">
+                    <span class="slot-title" id="t3">Terceiro horário</span>
+                    <span class="slot-sub">Opcional</span>
+                </div>
+                <input type="text" id="h3" placeholder="21:00" maxlength="5" oninput="mascara(this)" onblur="preencher(3,this.value)">
+            </div>
         </div>
-        <div class="info-item">
-            <span class="info-icon">📖</span>
-            <span class="info-text">Cada mensagem é gerada especialmente para você com base nas escrituras sagradas.</span>
+        <button class="btn-salvar" onclick="salvarHorarios()">Salvar horários</button>
+    </div>
+    {% else %}
+    <!-- HORÁRIO FIXO FREE -->
+    <div class="card">
+        <div class="horario-fixo">
+            <div class="hora">07:00</div>
+            <div class="hora-label">Horário fixo de envio — todos os dias</div>
         </div>
-        <div class="info-item">
-            <span class="info-icon">🔔</span>
-            <span class="info-text">A notificação aparece mesmo com o app fechado, desde que você tenha permitido no navegador.</span>
+        <div class="divider"></div>
+        <div class="premium-cta">
+            <p>Usuários <strong style="color:#e8c46a;">Premium</strong> podem escolher até 3 horários personalizados para receber mensagens ao longo do dia.</p>
+            <button class="btn-premium" onclick="mostrarPremium()">Conhecer o Premium</button>
         </div>
     </div>
+    {% endif %}
 </main>
 
 <footer>© 2026 Além da Fé — Feito com amor e fé &nbsp;·&nbsp; <span style="opacity:0.4;">v{{ app_version }}</span></footer>
 
+<!-- MODAL PREMIUM -->
+<div id="modal-premium" style="display:none; position:fixed; inset:0; background:rgba(5,8,15,0.92); z-index:998; backdrop-filter:blur(12px); align-items:center; justify-content:center; padding:20px;">
+    <div style="background:linear-gradient(160deg,#0e1420,#111827); border:1px solid rgba(201,150,58,0.25); max-width:360px; width:100%; padding:36px 28px; text-align:center; position:relative;">
+        <div style="position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(to right,transparent,rgba(201,150,58,0.7),transparent);"></div>
+        <p style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(201,150,58,0.6);margin-bottom:14px;">Versão Premium</p>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#f0ead8;line-height:1.3;margin-bottom:20px;">Eleve sua <em style="font-style:italic;color:#e8c46a;">experiência</em></h2>
+        <div style="font-size:12px;color:rgba(240,234,216,0.6);line-height:2;font-weight:300;margin-bottom:24px;">
+            Até 3 horários personalizados por dia<br>
+            Mensagens ilimitadas sob demanda<br>
+            Acesso à Bíblia integrada
+        </div>
+        <div style="font-size:28px;font-weight:700;color:#e8c46a;margin-bottom:4px;">R$ 9,90<span style="font-size:12px;font-weight:400;color:rgba(240,234,216,0.4)">/mês</span></div>
+        <div style="font-size:10px;color:rgba(240,234,216,0.3);margin-bottom:20px;">ou R$ 69,90/ano — economize 41%</div>
+        <button onclick="assinar('mensal')" style="width:100%;padding:15px;background:linear-gradient(135deg,#c9963a,#e8c46a);color:#05080f;border:none;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;margin-bottom:10px;">Assinar por R$ 9,90/mês</button>
+        <button onclick="assinar('anual')" style="width:100%;padding:13px;background:transparent;border:1px solid rgba(201,150,58,0.4);color:#e8c46a;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-bottom:16px;">Plano anual — R$ 69,90</button>
+        <button onclick="document.getElementById('modal-premium').style.display='none'" style="background:none;border:none;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(240,234,216,0.25);cursor:pointer;">Agora não</button>
+    </div>
+</div>
+
 <script>
 const VAPID_PUBLIC_KEY = '{{ vapid_public_key }}';
+const PLANO = '{{ plano }}';
 
 function urlBase64ToUint8Array(b64) {
     const pad = '='.repeat((4 - b64.length % 4) % 4);
@@ -329,9 +213,8 @@ function mostrarMsg(texto, tipo) {
 
 function setAtivo(ativo) {
     const badge = document.getElementById('status-badge');
-    const texto = document.getElementById('status-texto');
     badge.className = 'status-badge ' + (ativo ? 'ativo' : 'inativo');
-    texto.textContent = ativo ? 'Notificações ativas' : 'Notificações desativadas';
+    document.getElementById('status-texto').textContent = ativo ? 'Notificações ativas' : 'Notificações desativadas';
     document.getElementById('area-ativar').style.display = ativo ? 'none' : 'block';
     document.getElementById('area-ativo').style.display = ativo ? 'block' : 'none';
 }
@@ -340,8 +223,7 @@ async function verificarStatus() {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
         document.getElementById('area-ativar').style.display = 'none';
         document.getElementById('area-sem-suporte').style.display = 'block';
-        const badge = document.getElementById('status-badge');
-        badge.className = 'status-badge inativo';
+        document.getElementById('status-badge').className = 'status-badge inativo';
         document.getElementById('status-texto').textContent = 'Não suportado';
         return;
     }
@@ -350,36 +232,26 @@ async function verificarStatus() {
         await navigator.serviceWorker.ready;
         const sub = await reg.pushManager.getSubscription();
         setAtivo(!!sub);
-    } catch(e) {
-        setAtivo(false);
-    }
+    } catch(e) { setAtivo(false); }
 }
 
 async function ativar() {
     const btn = document.getElementById('btn-ativar');
     btn.textContent = 'Aguardando permissão...';
     btn.disabled = true;
-
     const perm = await Notification.requestPermission();
     if (perm !== 'granted') {
         btn.textContent = 'Ativar notificações';
         btn.disabled = false;
-        mostrarMsg('Permissão negada. Habilite notificações nas configurações do navegador.', 'err');
+        mostrarMsg('Permissão negada. Habilite nas configurações do navegador.', 'err');
         return;
     }
     try {
         const reg = await navigator.serviceWorker.ready;
-        const sub = await reg.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-        });
-        await fetch('/subscribe-push', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(sub)
-        });
+        const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
+        await fetch('/subscribe-push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sub) });
         setAtivo(true);
-        mostrarMsg('Notificações ativadas! Você receberá sua mensagem todo dia às 7h.', 'ok');
+        mostrarMsg('Notificações ativadas! Você receberá sua mensagem nos horários cadastrados.', 'ok');
     } catch(e) {
         btn.textContent = 'Ativar notificações';
         btn.disabled = false;
@@ -395,9 +267,70 @@ async function desativar() {
         await fetch('/desativar-push', { method: 'POST' });
         setAtivo(false);
         mostrarMsg('Notificações desativadas.', 'ok');
-    } catch(e) {
-        mostrarMsg('Erro ao desativar. Tente novamente.', 'err');
+    } catch(e) { mostrarMsg('Erro ao desativar.', 'err'); }
+}
+
+// PREMIUM — horários
+{% if plano == 'premium' %}
+const nomes = ['', 'Primeiro horário', 'Segundo horário', 'Terceiro horário'];
+
+function mascara(el) {
+    let v = el.value.replace(/\D/g, '').slice(0, 4);
+    if (v.length >= 3) v = v.slice(0,2) + ':' + v.slice(2);
+    el.value = v;
+}
+
+function preencher(n, val) {
+    const slot = document.getElementById('slot' + n);
+    const titulo = document.getElementById('t' + n);
+    if (val && val.length === 5) {
+        slot.classList.add('on');
+        titulo.textContent = val;
+    } else {
+        slot.classList.remove('on');
+        titulo.textContent = nomes[n];
     }
+}
+
+async function salvarHorarios() {
+    const h1 = document.getElementById('h1').value.trim();
+    const h2 = document.getElementById('h2').value.trim();
+    const h3 = document.getElementById('h3').value.trim();
+    if (!h1) { mostrarMsg('Preencha pelo menos o primeiro horário.', 'err'); return; }
+    const horarios = [h1, h2, h3].filter(h => h.length === 5);
+    const r = await fetch('/salvar-horarios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ horarios })
+    });
+    const d = await r.json();
+    if (d.ok) mostrarMsg('Horários salvos! Você receberá mensagens nesses horários.', 'ok');
+    else mostrarMsg('Erro ao salvar.', 'err');
+}
+
+async function carregarHorarios() {
+    const r = await fetch('/buscar-horarios');
+    const horarios = await r.json();
+    horarios.forEach((h, i) => {
+        const input = document.getElementById('h' + (i+1));
+        if (input) {
+            input.value = h;
+            preencher(i+1, h);
+        }
+    });
+}
+
+carregarHorarios();
+{% endif %}
+
+async function assinar(plano) {
+    const r = await fetch('/criar-pagamento', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({plano}) });
+    const d = await r.json();
+    if (d.ok) window.location.href = d.url;
+}
+
+function mostrarPremium() {
+    document.getElementById('modal-premium').style.display = 'flex';
 }
 
 verificarStatus();

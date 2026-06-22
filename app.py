@@ -9,7 +9,8 @@ from database import (init_db, salvar_mensagem, buscar_mensagem_hoje, criar_cont
                       fazer_login, email_existe, salvar_codigo, verificar_codigo,
                       atualizar_senha, salvar_push_subscription, buscar_todas_push_subscriptions,
                       ativar_premium, verificar_expiracao, buscar_usuarios_com_push, buscar_push_do_usuario,
-                      excluir_usuario, excluir_push_subscription, excluir_todas_push_do_usuario)
+                      excluir_usuario, excluir_push_subscription, excluir_todas_push_do_usuario,
+                      salvar_horarios, buscar_horarios, buscar_premium_com_push_na_hora, buscar_free_com_push)
 from ai import gerar_mensagem
 from functools import wraps
 
@@ -57,48 +58,66 @@ def get_periodo_atual():
         return "noite"
 
 
-def gerar_e_enviar_para_todos(tipo):
+def _enviar_push_para_lista(uids, tipo):
+    from pywebpush import webpush, WebPushException
+    for uid in uids:
+        try:
+            dados = gerar_mensagem(tipo)
+            salvar_mensagem(tipo, dados, uid)
+            texto_curto = dados.get("texto_versiculo", "")[:100] + "..."
+            payload = json.dumps({"title": "Além da Fé — Mensagem do dia", "body": texto_curto, "url": "/home"})
+            for sub in buscar_push_do_usuario(uid):
+                try:
+                    webpush(
+                        subscription_info={"endpoint": sub["endpoint"], "keys": {"p256dh": sub["p256dh"], "auth": sub["auth"]}},
+                        data=payload,
+                        vapid_private_key=VAPID_PRIVATE_KEY,
+                        vapid_claims=VAPID_CLAIMS
+                    )
+                except WebPushException as e:
+                    resp = getattr(e, "response", None)
+                    if resp is not None and resp.status_code in (404, 410):
+                        excluir_push_subscription(sub["endpoint"])
+                    else:
+                        print(f"Push falhou para usuário {uid}: {e}")
+        except Exception as e:
+            print(f"Erro ao processar usuário {uid}: {e}")
+
+
+def enviar_na_hora_atual():
     try:
-        from pywebpush import webpush, WebPushException
-        usuario_ids = buscar_usuarios_com_push()
-        print(f"Enviando mensagem de {tipo} para {len(usuario_ids)} usuário(s)...")
-        for uid in usuario_ids:
-            try:
-                dados = gerar_mensagem(tipo)
-                salvar_mensagem(tipo, dados, uid)
-                texto_curto = dados.get("texto_versiculo", "")[:100] + "..."
-                payload = json.dumps({
-                    "title": "Além da Fé — Mensagem do dia",
-                    "body": texto_curto,
-                    "url": "/home"
-                })
-                for sub in buscar_push_do_usuario(uid):
-                    try:
-                        webpush(
-                            subscription_info={
-                                "endpoint": sub["endpoint"],
-                                "keys": {"p256dh": sub["p256dh"], "auth": sub["auth"]}
-                            },
-                            data=payload,
-                            vapid_private_key=VAPID_PRIVATE_KEY,
-                            vapid_claims=VAPID_CLAIMS
-                        )
-                    except WebPushException as e:
-                        resp = getattr(e, "response", None)
-                        if resp is not None and resp.status_code in (404, 410):
-                            excluir_push_subscription(sub["endpoint"])
-                            print(f"Subscrição expirada removida para usuário {uid}")
-                        else:
-                            print(f"Push falhou para usuário {uid}: {e}")
-            except Exception as e:
-                print(f"Erro ao processar usuário {uid}: {e}")
+        agora = datetime.now(BRASIL_TZ)
+        hora_str = agora.strftime("%H:00")
+        hora_int = agora.hour
+        if hora_int < 12:
+            tipo = "manha"
+        elif hora_int < 18:
+            tipo = "tarde"
+        else:
+            tipo = "noite"
+
+        enviados = set()
+
+        # Premium com esse horário cadastrado
+        premium_ids = buscar_premium_com_push_na_hora(hora_str)
+        if premium_ids:
+            print(f"[{hora_str}] Enviando para {len(premium_ids)} usuário(s) premium...")
+            _enviar_push_para_lista(premium_ids, tipo)
+            enviados.update(premium_ids)
+
+        # Às 7h: free users também recebem
+        if hora_int == 7:
+            free_ids = [uid for uid in buscar_free_com_push() if uid not in enviados]
+            if free_ids:
+                print(f"[{hora_str}] Enviando para {len(free_ids)} usuário(s) gratuito(s)...")
+                _enviar_push_para_lista(free_ids, "manha")
     except Exception as e:
-        print(f"Erro geral no push: {e}")
+        print(f"Erro no envio horário: {e}")
 
 
 def agendar_mensagens():
     scheduler = BackgroundScheduler(timezone=BRASIL_TZ)
-    scheduler.add_job(lambda: gerar_e_enviar_para_todos("manha"), "cron", hour=7, minute=0)
+    scheduler.add_job(enviar_na_hora_atual, "cron", minute=0)
     scheduler.start()
     return scheduler
 
@@ -269,6 +288,32 @@ def cadastro():
 def desativar_push():
     excluir_todas_push_do_usuario(session["usuario_id"])
     return jsonify({"ok": True})
+
+
+@app.route("/salvar-horarios", methods=["POST"])
+@login_required
+def salvar_horarios_route():
+    if session.get("usuario_plano") != "premium":
+        return jsonify({"ok": False, "erro": "premium"})
+    dados = request.get_json()
+    horarios = dados.get("horarios", [])
+    horarios_validos = []
+    for h in horarios:
+        h = str(h).strip()
+        if len(h) == 5 and h[2] == ":" and h[:2].isdigit() and h[3:].isdigit():
+            hh, mm = int(h[:2]), int(h[3:])
+            if 0 <= hh <= 23 and 0 <= mm <= 59:
+                horarios_validos.append(f"{hh:02d}:00")
+    salvar_horarios(session["usuario_id"], list(dict.fromkeys(horarios_validos)))
+    return jsonify({"ok": True})
+
+
+@app.route("/buscar-horarios")
+@login_required
+def buscar_horarios_route():
+    if session.get("usuario_plano") != "premium":
+        return jsonify([])
+    return jsonify(buscar_horarios(session["usuario_id"]))
 
 
 @app.route("/biblia")
