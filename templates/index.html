@@ -578,6 +578,9 @@
     <div class="hd-in">
         <a href="/" class="hd-name">Além da <b>Fé</b></a>
         <nav>
+            {% if is_admin %}
+            <a href="/admin" style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#05080f;background:linear-gradient(135deg,#c9963a,#e8c46a);padding:5px 12px;text-decoration:none;">Admin</a>
+            {% endif %}
             {% if plano == 'premium' %}
             <a href="/biblia" style="color:#e8c46a; font-size:13px; letter-spacing:2px; text-shadow: 0 0 10px rgba(232,196,106,0.9), 0 0 25px rgba(201,150,58,0.6); animation: brilhoNav 2.5s ease-in-out infinite;">Bíblia</a>
             {% endif %}

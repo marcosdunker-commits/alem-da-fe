@@ -246,7 +246,8 @@ def home():
                            plano=session.get("usuario_plano", "gratuito"),
                            trial=info["trial"],
                            dias_restantes=info["dias_restantes"],
-                           vapid_public_key=VAPID_PUBLIC_KEY)
+                           vapid_public_key=VAPID_PUBLIC_KEY,
+                           is_admin=session.get("usuario_email") == ADMIN_EMAIL)
 
 
 @app.route("/cadastro")
