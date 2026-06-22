@@ -25,16 +25,23 @@ _BIBLIA_DATA = None
 def _carregar_biblia():
     global _BIBLIA_DATA
     if not os.path.exists(_BIBLIA_PATH):
-        try:
-            import urllib.request
-            print("Baixando Bíblia completa (primeira execução)...")
-            urllib.request.urlretrieve(
-                "https://raw.githubusercontent.com/thiagobodruk/biblia/master/json/pt_aa.json",
-                _BIBLIA_PATH
-            )
-            print("Bíblia baixada com sucesso.")
-        except Exception as e:
-            print(f"Aviso: não foi possível baixar a Bíblia: {e}")
+        import urllib.request
+        urls = [
+            "https://raw.githubusercontent.com/thiagobodruk/biblia/main/json/pt_aa.json",
+            "https://raw.githubusercontent.com/thiagobodruk/biblia/master/json/pt_aa.json",
+        ]
+        baixado = False
+        for url in urls:
+            try:
+                print(f"Baixando Bíblia completa de {url}...")
+                urllib.request.urlretrieve(url, _BIBLIA_PATH)
+                print("Bíblia baixada com sucesso.")
+                baixado = True
+                break
+            except Exception as e:
+                print(f"Falhou ({url}): {e}")
+        if not baixado:
+            print("Aviso: Bíblia não pôde ser baixada.")
             return
     try:
         with open(_BIBLIA_PATH, encoding="utf-8") as f:
@@ -353,13 +360,22 @@ def biblia():
 @app.route("/api/biblia/<int:livro>/<int:capitulo>")
 @login_required
 def api_biblia(livro, capitulo):
-    if _BIBLIA_DATA is None or livro < 0 or livro >= len(_BIBLIA_DATA):
+    import urllib.request as _urlreq
+    # Tenta dados locais primeiro (mais rápido)
+    if _BIBLIA_DATA is not None and 0 <= livro < len(_BIBLIA_DATA):
+        chapters = _BIBLIA_DATA[livro].get("chapters", [])
+        if 1 <= capitulo <= len(chapters):
+            verses = chapters[capitulo - 1]
+            return jsonify({"verses": [{"verse": i + 1, "text": v} for i, v in enumerate(verses)]})
+    # Fallback: api.getbible.net por capítulo (livro é 1-based na API)
+    try:
+        url = f"https://api.getbible.net/v2/almeida/{livro + 1}/{capitulo}.json"
+        with _urlreq.urlopen(url, timeout=10) as resp:
+            data = json.loads(resp.read())
+        verses = [{"verse": v["verse"], "text": v["text"]} for v in data.get("verses", [])]
+        return jsonify({"verses": verses})
+    except Exception:
         return jsonify({"error": "not found"}), 404
-    chapters = _BIBLIA_DATA[livro].get("chapters", [])
-    if capitulo < 1 or capitulo > len(chapters):
-        return jsonify({"error": "not found"}), 404
-    verses = chapters[capitulo - 1]
-    return jsonify({"verses": [{"verse": i + 1, "text": v} for i, v in enumerate(verses)]})
 
 
 @app.route("/nova-mensagem")
