@@ -319,8 +319,6 @@ def buscar_horarios_route():
 @app.route("/biblia")
 @login_required
 def biblia():
-    if session.get("usuario_plano") != "premium":
-        return redirect(url_for("home") + "?premium=biblia")
     return render_template("biblia.html",
                            nome=session.get("usuario_nome", ""),
                            plano=session.get("usuario_plano", "gratuito"))
