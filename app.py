@@ -9,7 +9,7 @@ from database import (init_db, salvar_mensagem, buscar_mensagem_hoje, criar_cont
                       fazer_login, email_existe, salvar_codigo, verificar_codigo,
                       atualizar_senha, salvar_push_subscription, buscar_todas_push_subscriptions,
                       ativar_premium, verificar_expiracao, buscar_usuarios_com_push, buscar_push_do_usuario,
-                      excluir_usuario)
+                      excluir_usuario, excluir_push_subscription, excluir_todas_push_do_usuario)
 from ai import gerar_mensagem
 from functools import wraps
 
@@ -84,7 +84,12 @@ def gerar_e_enviar_para_todos(tipo):
                             vapid_claims=VAPID_CLAIMS
                         )
                     except WebPushException as e:
-                        print(f"Push falhou para usuário {uid}: {e}")
+                        resp = getattr(e, "response", None)
+                        if resp is not None and resp.status_code in (404, 410):
+                            excluir_push_subscription(sub["endpoint"])
+                            print(f"Subscrição expirada removida para usuário {uid}")
+                        else:
+                            print(f"Push falhou para usuário {uid}: {e}")
             except Exception as e:
                 print(f"Erro ao processar usuário {uid}: {e}")
     except Exception as e:
@@ -255,7 +260,15 @@ def home():
 def cadastro():
     return render_template("cadastro.html",
                            nome=session.get("usuario_nome", ""),
-                           plano=session.get("usuario_plano", "gratuito"))
+                           plano=session.get("usuario_plano", "gratuito"),
+                           vapid_public_key=VAPID_PUBLIC_KEY)
+
+
+@app.route("/desativar-push", methods=["POST"])
+@login_required
+def desativar_push():
+    excluir_todas_push_do_usuario(session["usuario_id"])
+    return jsonify({"ok": True})
 
 
 @app.route("/biblia")

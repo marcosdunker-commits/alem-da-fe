@@ -256,3 +256,15 @@ def excluir_usuario(usuario_id):
     conn.execute("DELETE FROM usuarios WHERE id=?", (usuario_id,))
     conn.commit()
     conn.close()
+
+def excluir_push_subscription(endpoint):
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("DELETE FROM push_subscriptions WHERE endpoint=?", (endpoint,))
+    conn.commit()
+    conn.close()
+
+def excluir_todas_push_do_usuario(usuario_id):
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("DELETE FROM push_subscriptions WHERE usuario_id=?", (usuario_id,))
+    conn.commit()
+    conn.close()
