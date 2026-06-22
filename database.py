@@ -1,13 +1,19 @@
 import sqlite3
 import os
 import hashlib
+import bcrypt
 from datetime import date
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "alem_da_fe.db")
 
 
 def hash_senha(senha):
-    return hashlib.sha256(senha.encode()).hexdigest()
+    return bcrypt.hashpw(senha.encode(), bcrypt.gensalt()).decode()
+
+def _verificar_senha(senha, hash_salvo):
+    if hash_salvo.startswith("$2b$") or hash_salvo.startswith("$2a$"):
+        return bcrypt.checkpw(senha.encode(), hash_salvo.encode())
+    return hashlib.sha256(senha.encode()).hexdigest() == hash_salvo
 
 
 def init_db():
@@ -97,12 +103,15 @@ def criar_conta(nome, email, telefone, senha):
 def fazer_login(email, senha):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT id, nome, email, plano FROM usuarios WHERE email=? AND senha=? AND ativo=1",
-              (email, hash_senha(senha)))
+    c.execute("SELECT id, nome, email, plano, senha FROM usuarios WHERE email=? AND ativo=1", (email,))
     row = c.fetchone()
-    conn.close()
-    if row:
+    if row and _verificar_senha(senha, row[4]):
+        if not row[4].startswith("$2b$"):
+            c.execute("UPDATE usuarios SET senha=? WHERE id=?", (hash_senha(senha), row[0]))
+            conn.commit()
+        conn.close()
         return {"id": row[0], "nome": row[1], "email": row[2], "plano": row[3]}
+    conn.close()
     return None
 
 

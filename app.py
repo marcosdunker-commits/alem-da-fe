@@ -16,7 +16,10 @@ from functools import wraps
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "alem-da-fe-secret-2026")
+_secret = os.getenv("SECRET_KEY")
+if not _secret:
+    raise RuntimeError("SECRET_KEY não definida no .env")
+app.secret_key = _secret
 
 def _ler_versao():
     try:
@@ -368,7 +371,7 @@ ADMIN_EMAIL = "marcosdunker@gmail.com"
 
 @app.route("/admin")
 def admin():
-    if session.get("usuario_plano") != "admin" and session.get("usuario_email") != ADMIN_EMAIL:
+    if session.get("usuario_email") != ADMIN_EMAIL:
         return redirect(url_for("login"))
     return render_template("admin.html")
 

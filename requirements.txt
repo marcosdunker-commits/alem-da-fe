@@ -6,3 +6,4 @@ python-dotenv
 pywebpush
 mercadopago
 paramiko
+bcrypt
