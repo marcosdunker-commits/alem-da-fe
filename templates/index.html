@@ -632,7 +632,6 @@
         {% endif %}
         <a href="/cadastro" class="btn btn-ghost">Cadastro de mensagem diária</a>
         <button class="btn btn-ghost" onclick="compartilhar()">Compartilhar</button>
-        <button class="btn btn-ghost" id="btn-notif" onclick="ativarNotificacoes()" style="display:none;">Ativar notificações</button>
     </div>
 
 
@@ -950,47 +949,9 @@ function urlBase64ToUint8Array(b64) {
     return arr;
 }
 
-async function iniciarPWA() {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-    try {
-        await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-        const reg = await navigator.serviceWorker.ready;
-        const sub = await reg.pushManager.getSubscription();
-        const btn = document.getElementById('btn-notif');
-        if (!sub && Notification.permission !== 'denied') {
-            btn.style.display = 'block';
-        } else if (sub) {
-            btn.style.display = 'block';
-            btn.textContent = 'Notificações ativas';
-            btn.style.opacity = '0.5';
-            btn.disabled = true;
-        }
-    } catch(e) {}
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' });
 }
-
-async function ativarNotificacoes() {
-    if (!('serviceWorker' in navigator)) return;
-    const perm = await Notification.requestPermission();
-    if (perm !== 'granted') return;
-    try {
-        const reg = await navigator.serviceWorker.ready;
-        const sub = await reg.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-        });
-        await fetch('/subscribe-push', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(sub)
-        });
-        const btn = document.getElementById('btn-notif');
-        btn.textContent = 'Notificações ativas';
-        btn.style.opacity = '0.5';
-        btn.disabled = true;
-    } catch(e) { console.error('Erro ao ativar notificações:', e); }
-}
-
-iniciarPWA();
 
 let promptInstalacao = null;
 
