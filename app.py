@@ -370,7 +370,8 @@ def api_biblia(livro, capitulo):
     # Fallback: api.getbible.net por capítulo (livro é 1-based na API)
     try:
         url = f"https://api.getbible.net/v2/almeida/{livro + 1}/{capitulo}.json"
-        with _urlreq.urlopen(url, timeout=10) as resp:
+        req = _urlreq.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with _urlreq.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read())
         verses = [{"verse": v["verse"], "text": v["text"]} for v in data.get("verses", [])]
         return jsonify({"verses": verses})
