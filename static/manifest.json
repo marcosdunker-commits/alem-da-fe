@@ -1,7 +1,7 @@
 {
   "name": "Além da Fé",
   "short_name": "Além da Fé",
-  "description": "Palavra de Deus enviada para você",
+  "description": "Palavra de Deus enviada para você todos os dias",
   "start_url": "/home",
   "scope": "/",
   "display": "standalone",
@@ -9,18 +9,39 @@
   "theme_color": "#e8c46a",
   "orientation": "portrait",
   "lang": "pt-BR",
+  "categories": ["lifestyle", "education"],
   "icons": [
+    { "src": "/static/icon-72.png",  "sizes": "72x72",   "type": "image/png", "purpose": "any" },
+    { "src": "/static/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "any" },
+    { "src": "/static/icon-128.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icon-144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icon-152.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icon-384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icon-1024.png","sizes": "1024x1024","type": "image/png", "purpose": "any" },
+    { "src": "/static/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/static/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
     {
-      "src": "/static/logo.png",
-      "sizes": "192x192",
+      "src": "/static/icon-1024.png",
+      "sizes": "1024x1024",
       "type": "image/png",
-      "purpose": "any maskable"
+      "form_factor": "narrow",
+      "label": "Além da Fé — Mensagem diária"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Minha mensagem",
+      "url": "/home",
+      "icons": [{ "src": "/static/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "src": "/static/logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "name": "Bíblia",
+      "url": "/biblia",
+      "icons": [{ "src": "/static/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
