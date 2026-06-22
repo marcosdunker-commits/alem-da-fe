@@ -283,6 +283,10 @@
             <input type="password" id="c-senha" placeholder="Mínimo 6 caracteres">
         </div>
         <div class="field">
+            <label>Telefone (WhatsApp)</label>
+            <input type="tel" id="c-telefone" placeholder="(00) 00000-0000" oninput="mascaraTel(this)" maxlength="15">
+        </div>
+        <div class="field">
             <label>Confirmar senha</label>
             <input type="password" id="c-senha2" placeholder="Repita a senha" onkeydown="if(event.key==='Enter') cadastrar()">
         </div>
@@ -346,18 +350,27 @@ function verSenha(mostrar) {
     document.getElementById('c-senha2').type = tipo;
 }
 
+function mascaraTel(el) {
+    let v = el.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length > 6) v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+    else if (v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+    else if (v.length > 0) v = '(' + v;
+    el.value = v;
+}
+
 async function cadastrar() {
     document.getElementById('erro-cadastro').style.display = 'none';
     const nome = document.getElementById('c-nome').value.trim();
     const email = document.getElementById('c-email').value.trim();
+    const telefone = document.getElementById('c-telefone').value.trim();
     const senha = document.getElementById('c-senha').value;
     const senha2 = document.getElementById('c-senha2').value;
-    if (!nome || !email || !senha || !senha2) return mostrarErro('erro-cadastro', 'Preencha todos os campos.');
+    if (!nome || !email || !telefone || !senha || !senha2) return mostrarErro('erro-cadastro', 'Preencha todos os campos.');
     if (senha !== senha2) return mostrarErro('erro-cadastro', 'As senhas não conferem.');
     const r = await fetch('/registrar', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({nome, email, senha})
+        body: JSON.stringify({nome, email, telefone, senha})
     });
     const d = await r.json();
     if (d.ok) { window.location.href = '/home'; }

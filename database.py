@@ -57,6 +57,11 @@ def init_db():
     except Exception:
         pass
     try:
+        c.execute("ALTER TABLE usuarios ADD COLUMN telefone TEXT")
+        conn.commit()
+    except Exception:
+        pass
+    try:
         c.execute("ALTER TABLE mensagens ADD COLUMN usuario_id INTEGER")
         conn.commit()
     except Exception:
@@ -75,12 +80,12 @@ def init_db():
     conn.close()
 
 
-def criar_conta(nome, email, senha):
+def criar_conta(nome, email, telefone, senha):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     try:
-        c.execute("INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)",
-                  (nome, email, hash_senha(senha)))
+        c.execute("INSERT INTO usuarios (nome, email, telefone, senha) VALUES (?, ?, ?, ?)",
+                  (nome, email, telefone, hash_senha(senha)))
         conn.commit()
         return True, c.lastrowid
     except sqlite3.IntegrityError:
@@ -218,3 +223,27 @@ def buscar_todas_push_subscriptions():
     rows = c.fetchall()
     conn.close()
     return [{"endpoint": r[0], "p256dh": r[1], "auth": r[2]} for r in rows]
+
+def buscar_usuarios_com_push():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT DISTINCT usuario_id FROM push_subscriptions")
+    rows = c.fetchall()
+    conn.close()
+    return [r[0] for r in rows]
+
+def buscar_push_do_usuario(usuario_id):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT endpoint, p256dh, auth FROM push_subscriptions WHERE usuario_id=?", (usuario_id,))
+    rows = c.fetchall()
+    conn.close()
+    return [{"endpoint": r[0], "p256dh": r[1], "auth": r[2]} for r in rows]
+
+def excluir_usuario(usuario_id):
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("DELETE FROM push_subscriptions WHERE usuario_id=?", (usuario_id,))
+    conn.execute("DELETE FROM mensagens WHERE usuario_id=?", (usuario_id,))
+    conn.execute("DELETE FROM usuarios WHERE id=?", (usuario_id,))
+    conn.commit()
+    conn.close()

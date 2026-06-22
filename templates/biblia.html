@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Bíblia — Além da Fé</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#e8c46a">
+    <link rel="apple-touch-icon" href="/static/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #05080f;
+            color: #f0ead8;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .hd {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 0 24px;
+            background: rgba(5,8,15,0.97);
+            border-bottom: 1px solid rgba(201,150,58,0.12);
+        }
+        .hd-in {
+            max-width: 700px;
+            margin: 0 auto;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .hd-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            font-weight: 400;
+            color: #f0ead8;
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+        .hd-name b { color: #e8c46a; font-weight: 400; }
+        nav { display: flex; gap: 6px; }
+        nav a {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(240,234,216,0.45);
+            text-decoration: none;
+            padding: 6px 10px;
+            transition: .2s;
+        }
+        nav a:hover, nav a.on { color: #e8c46a; }
+        @keyframes brilhoNav {
+            0%, 100% { text-shadow: 0 0 10px rgba(232,196,106,0.9), 0 0 25px rgba(201,150,58,0.6); }
+            50% { text-shadow: 0 0 18px rgba(255,220,120,1), 0 0 45px rgba(232,196,106,0.9), 0 0 70px rgba(201,150,58,0.5); }
+        }
+
+        /* LAYOUT */
+        .wrap {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 80px 20px 60px;
+        }
+
+        /* TOPO */
+        .page-title {
+            text-align: center;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(201,150,58,0.12);
+        }
+        .page-title p {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(201,150,58,0.6);
+            margin-bottom: 6px;
+        }
+        .page-title h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            font-weight: 300;
+            color: #f0ead8;
+        }
+        .page-title h1 em { color: #e8c46a; font-style: italic; }
+        .page-title h1 .destaque {
+            color: #e8c46a;
+            font-style: italic;
+            text-shadow:
+                0 0 20px rgba(232,196,106,0.9),
+                0 0 50px rgba(201,150,58,0.6),
+                0 0 90px rgba(201,150,58,0.3);
+            animation: brilho 3s ease-in-out infinite;
+        }
+        @keyframes brilho {
+            0%, 100% {
+                text-shadow:
+                    0 0 20px rgba(232,196,106,0.9),
+                    0 0 50px rgba(201,150,58,0.6),
+                    0 0 90px rgba(201,150,58,0.3);
+            }
+            50% {
+                text-shadow:
+                    0 0 30px rgba(255,220,120,1),
+                    0 0 70px rgba(232,196,106,0.9),
+                    0 0 120px rgba(201,150,58,0.6);
+            }
+        }
+
+        /* SELETOR */
+        .seletor {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .seletor select {
+            background: #0e1420;
+            border: 1px solid rgba(201,150,58,0.2);
+            color: #f0ead8;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            padding: 12px 14px;
+            appearance: none;
+            cursor: pointer;
+            outline: none;
+            transition: .2s;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(201,150,58,0.6)'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+        .seletor select:focus { border-color: rgba(201,150,58,0.5); }
+
+        /* NAV CAPÍTULOS */
+        .cap-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .cap-btn {
+            background: transparent;
+            border: 1px solid rgba(201,150,58,0.2);
+            color: #e8c46a;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: .2s;
+        }
+        .cap-btn:hover { border-color: rgba(201,150,58,0.6); background: rgba(201,150,58,0.05); }
+        .cap-btn:disabled { opacity: 0.25; cursor: default; }
+        .cap-info {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: rgba(240,234,216,0.5);
+            text-align: center;
+            flex: 1;
+        }
+
+        /* VERSÍCULOS */
+        .verses-box {
+            background: linear-gradient(160deg, #0e1420 0%, #111827 100%);
+            border: 1px solid rgba(201,150,58,0.12);
+            position: relative;
+            overflow: hidden;
+            min-height: 300px;
+        }
+        .verses-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(201,150,58,0.5), transparent);
+        }
+        .verses-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(201,150,58,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .verses-ref {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: rgba(201,150,58,0.7);
+        }
+        .verses-list {
+            padding: 24px;
+            list-style: none;
+        }
+        .verse-item {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 18px;
+            line-height: 1.85;
+        }
+        .verse-num {
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(201,150,58,0.5);
+            min-width: 22px;
+            padding-top: 3px;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+        .verse-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 19px;
+            font-weight: 300;
+            color: #f0ead8;
+            line-height: 1.75;
+        }
+
+        /* LOADING */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+            gap: 16px;
+        }
+        .spin {
+            width: 24px; height: 24px;
+            border: 1px solid rgba(201,150,58,0.2);
+            border-top-color: #e8c46a;
+            border-radius: 50%;
+            animation: sp .8s linear infinite;
+        }
+        @keyframes sp { to { transform: rotate(360deg); } }
+        .loading p {
+            font-size: 11px;
+            color: rgba(240,234,216,0.3);
+            letter-spacing: 1px;
+        }
+
+        /* ERRO */
+        .erro {
+            padding: 40px 24px;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(240,234,216,0.3);
+        }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid rgba(201,150,58,0.1);
+            padding: 24px 20px;
+            text-align: center;
+        }
+        .ft-copy { font-size: 10px; color: rgba(240,234,216,0.15); letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+
+<header class="hd">
+    <div class="hd-in">
+        <a href="/home" class="hd-name">Além da <b>Fé</b></a>
+        <nav>
+            <a href="/home">Início</a>
+            <a href="/biblia" class="on" style="color:#e8c46a; font-size:13px; letter-spacing:2px; text-shadow: 0 0 10px rgba(232,196,106,0.9), 0 0 25px rgba(201,150,58,0.6); animation: brilhoNav 2.5s ease-in-out infinite;">Bíblia</a>
+            <a href="/logout">Sair</a>
+        </nav>
+    </div>
+</header>
+
+<div class="wrap">
+    <div class="page-title">
+        <p>Palavra de Deus</p>
+        <h1><span class="destaque">Bíblia</span> <em>Digital</em></h1>
+    </div>
+
+    <div class="seletor">
+        <select id="sel-livro" onchange="mudarLivro()"></select>
+        <select id="sel-cap" onchange="carregarCapitulo()"></select>
+    </div>
+
+    <div class="cap-nav">
+        <button class="cap-btn" id="btn-ant" onclick="capAnterior()">← Anterior</button>
+        <span class="cap-info" id="cap-info"></span>
+        <button class="cap-btn" id="btn-prox" onclick="capProximo()">Próximo →</button>
+    </div>
+
+    <div class="verses-box" id="verses-box">
+        <div class="loading">
+            <div class="spin"></div>
+            <p>Carregando...</p>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="ft-copy">© 2026 Além da Fé &nbsp;·&nbsp; v{{ app_version }}</div>
+</footer>
+
+<script>
+const LIVROS = [
+    {nome:"Gênesis",api:"genesis",caps:50},{nome:"Êxodo",api:"exodus",caps:40},{nome:"Levítico",api:"leviticus",caps:27},
+    {nome:"Números",api:"numbers",caps:36},{nome:"Deuteronômio",api:"deuteronomy",caps:34},{nome:"Josué",api:"joshua",caps:24},
+    {nome:"Juízes",api:"judges",caps:21},{nome:"Rute",api:"ruth",caps:4},{nome:"1 Samuel",api:"1+samuel",caps:31},
+    {nome:"2 Samuel",api:"2+samuel",caps:24},{nome:"1 Reis",api:"1+kings",caps:22},{nome:"2 Reis",api:"2+kings",caps:25},
+    {nome:"1 Crônicas",api:"1+chronicles",caps:29},{nome:"2 Crônicas",api:"2+chronicles",caps:36},{nome:"Esdras",api:"ezra",caps:10},
+    {nome:"Neemias",api:"nehemiah",caps:13},{nome:"Ester",api:"esther",caps:10},{nome:"Jó",api:"job",caps:42},
+    {nome:"Salmos",api:"psalms",caps:150},{nome:"Provérbios",api:"proverbs",caps:31},{nome:"Eclesiastes",api:"ecclesiastes",caps:12},
+    {nome:"Cânticos",api:"song+of+solomon",caps:8},{nome:"Isaías",api:"isaiah",caps:66},{nome:"Jeremias",api:"jeremiah",caps:52},
+    {nome:"Lamentações",api:"lamentations",caps:5},{nome:"Ezequiel",api:"ezekiel",caps:48},{nome:"Daniel",api:"daniel",caps:12},
+    {nome:"Oséias",api:"hosea",caps:14},{nome:"Joel",api:"joel",caps:3},{nome:"Amós",api:"amos",caps:9},
+    {nome:"Obadias",api:"obadiah",caps:1},{nome:"Jonas",api:"jonah",caps:4},{nome:"Miquéias",api:"micah",caps:7},
+    {nome:"Naum",api:"nahum",caps:3},{nome:"Habacuque",api:"habakkuk",caps:3},{nome:"Sofonias",api:"zephaniah",caps:3},
+    {nome:"Ageu",api:"haggai",caps:2},{nome:"Zacarias",api:"zechariah",caps:14},{nome:"Malaquias",api:"malachi",caps:4},
+    {nome:"Mateus",api:"matthew",caps:28},{nome:"Marcos",api:"mark",caps:16},{nome:"Lucas",api:"luke",caps:24},
+    {nome:"João",api:"john",caps:21},{nome:"Atos",api:"acts",caps:28},{nome:"Romanos",api:"romans",caps:16},
+    {nome:"1 Coríntios",api:"1+corinthians",caps:16},{nome:"2 Coríntios",api:"2+corinthians",caps:13},{nome:"Gálatas",api:"galatians",caps:6},
+    {nome:"Efésios",api:"ephesians",caps:6},{nome:"Filipenses",api:"philippians",caps:4},{nome:"Colossenses",api:"colossians",caps:4},
+    {nome:"1 Tessalonicenses",api:"1+thessalonians",caps:5},{nome:"2 Tessalonicenses",api:"2+thessalonians",caps:3},
+    {nome:"1 Timóteo",api:"1+timothy",caps:6},{nome:"2 Timóteo",api:"2+timothy",caps:4},{nome:"Tito",api:"titus",caps:3},
+    {nome:"Filemom",api:"philemon",caps:1},{nome:"Hebreus",api:"hebrews",caps:13},{nome:"Tiago",api:"james",caps:5},
+    {nome:"1 Pedro",api:"1+peter",caps:5},{nome:"2 Pedro",api:"2+peter",caps:3},{nome:"1 João",api:"1+john",caps:5},
+    {nome:"2 João",api:"2+john",caps:1},{nome:"3 João",api:"3+john",caps:1},{nome:"Judas",api:"jude",caps:1},
+    {nome:"Apocalipse",api:"revelation",caps:22}
+];
+
+let livroAtual = 0;
+let capAtual = 1;
+
+function init() {
+    const sel = document.getElementById('sel-livro');
+    LIVROS.forEach((l, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = l.nome;
+        sel.appendChild(opt);
+    });
+    // Começa em João
+    sel.value = 43;
+    livroAtual = 43;
+    atualizarCaps();
+    carregarCapitulo();
+}
+
+function mudarLivro() {
+    livroAtual = parseInt(document.getElementById('sel-livro').value);
+    capAtual = 1;
+    atualizarCaps();
+    carregarCapitulo();
+}
+
+function atualizarCaps() {
+    const sel = document.getElementById('sel-cap');
+    const total = LIVROS[livroAtual].caps;
+    sel.innerHTML = '';
+    for (let i = 1; i <= total; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = 'Capítulo ' + i;
+        sel.appendChild(opt);
+    }
+    sel.value = capAtual;
+}
+
+async function carregarCapitulo() {
+    capAtual = parseInt(document.getElementById('sel-cap').value);
+    const livro = LIVROS[livroAtual];
+    const total = livro.caps;
+
+    document.getElementById('cap-info').textContent = livro.nome + ' ' + capAtual + ' / ' + total;
+    document.getElementById('btn-ant').disabled = capAtual <= 1 && livroAtual === 0;
+    document.getElementById('btn-prox').disabled = capAtual >= total && livroAtual === LIVROS.length - 1;
+
+    document.getElementById('verses-box').innerHTML = `
+        <div class="loading"><div class="spin"></div><p>Carregando ${livro.nome} ${capAtual}...</p></div>
+    `;
+
+    try {
+        const url = `https://bible-api.com/${livro.api}+${capAtual}?translation=almeida`;
+        const r = await fetch(url);
+        if (!r.ok) throw new Error('Erro na API');
+        const d = await r.json();
+
+        let html = `
+            <div class="verses-header">
+                <span class="verses-ref">${livro.nome} — Capítulo ${capAtual}</span>
+            </div>
+            <ul class="verses-list">
+        `;
+        d.verses.forEach(v => {
+            html += `
+                <li class="verse-item">
+                    <span class="verse-num">${v.verse}</span>
+                    <span class="verse-text">${v.text.trim()}</span>
+                </li>
+            `;
+        });
+        html += '</ul>';
+        document.getElementById('verses-box').innerHTML = html;
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    } catch(e) {
+        document.getElementById('verses-box').innerHTML = `
+            <div class="erro">Não foi possível carregar este capítulo. Tente novamente.</div>
+        `;
+    }
+}
+
+function capAnterior() {
+    if (capAtual > 1) {
+        capAtual--;
+    } else if (livroAtual > 0) {
+        livroAtual--;
+        document.getElementById('sel-livro').value = livroAtual;
+        capAtual = LIVROS[livroAtual].caps;
+    }
+    document.getElementById('sel-cap').value = capAtual;
+    carregarCapitulo();
+}
+
+function capProximo() {
+    if (capAtual < LIVROS[livroAtual].caps) {
+        capAtual++;
+    } else if (livroAtual < LIVROS.length - 1) {
+        livroAtual++;
+        document.getElementById('sel-livro').value = livroAtual;
+        capAtual = 1;
+        atualizarCaps();
+    }
+    document.getElementById('sel-cap').value = capAtual;
+    carregarCapitulo();
+}
+
+init();
+</script>
+</body>
+</html>

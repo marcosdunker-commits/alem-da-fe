@@ -59,6 +59,10 @@
             transition: .2s;
         }
         nav a:hover, nav a.on { color: #e8c46a; }
+        @keyframes brilhoNav {
+            0%, 100% { text-shadow: 0 0 10px rgba(232,196,106,0.9), 0 0 25px rgba(201,150,58,0.6); }
+            50% { text-shadow: 0 0 18px rgba(255,220,120,1), 0 0 45px rgba(232,196,106,0.9), 0 0 70px rgba(201,150,58,0.5); }
+        }
 
         /* ── HERO com logo em destaque ── */
         .hero {
@@ -574,6 +578,9 @@
     <div class="hd-in">
         <a href="/" class="hd-name">Além da <b>Fé</b></a>
         <nav>
+            {% if plano == 'premium' %}
+            <a href="/biblia" style="color:#e8c46a; font-size:13px; letter-spacing:2px; text-shadow: 0 0 10px rgba(232,196,106,0.9), 0 0 25px rgba(201,150,58,0.6); animation: brilhoNav 2.5s ease-in-out infinite;">Bíblia</a>
+            {% endif %}
             <a href="/logout">Sair</a>
         </nav>
     </div>

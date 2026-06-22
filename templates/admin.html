@@ -26,6 +26,8 @@
         .btn-upgrade{padding:6px 14px;background:linear-gradient(135deg,#c9963a,#e8c46a);color:#05080f;border:none;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:.2s}
         .btn-upgrade:hover{opacity:.85}
         .btn-downgrade{padding:6px 14px;background:transparent;border:1px solid rgba(240,234,216,0.15);color:rgba(240,234,216,0.35);font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+        .btn-delete{padding:6px 14px;background:transparent;border:1px solid rgba(180,50,50,0.4);color:rgba(255,120,120,0.7);font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-left:6px;transition:.2s}
+        .btn-delete:hover{background:rgba(180,50,50,0.15);color:#ff9090}
         .msg{padding:10px 14px;font-size:11px;margin-bottom:16px;display:none}
         .msg.ok{background:rgba(50,180,50,0.1);border:1px solid rgba(50,180,50,0.3);color:#90ff90}
         .msg.err{background:rgba(180,50,50,0.1);border:1px solid rgba(180,50,50,0.3);color:#ff9090}
@@ -44,6 +46,7 @@
                 <tr>
                     <th>Nome</th>
                     <th>Email</th>
+                    <th>Telefone</th>
                     <th>Plano</th>
                     <th>Ação</th>
                 </tr>
@@ -64,12 +67,14 @@ async function carregar() {
         <tr>
             <td>${u.nome}</td>
             <td>${u.email}</td>
+            <td>${u.telefone || '—'}</td>
             <td><span class="badge ${u.plano === 'premium' ? 'badge-premium' : 'badge-free'}">${u.plano}</span></td>
             <td>
                 ${u.plano !== 'premium'
                     ? `<button class="btn-upgrade" onclick="mudarPlano(${u.id},'premium')">Liberar Premium</button>`
                     : `<button class="btn-downgrade" onclick="mudarPlano(${u.id},'gratuito')">Revogar</button>`
                 }
+                <button class="btn-delete" onclick="excluirUsuario(${u.id}, '${u.nome}')">Excluir</button>
             </td>
         </tr>`;
     });
@@ -84,6 +89,22 @@ async function mudarPlano(id, plano) {
     const d = await r.json();
     const msg = document.getElementById('msg');
     msg.textContent = d.ok ? 'Plano atualizado com sucesso!' : 'Erro: ' + d.erro;
+    msg.className = 'msg ' + (d.ok ? 'ok' : 'err');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 3000);
+    if (d.ok) carregar();
+}
+
+async function excluirUsuario(id, nome) {
+    if (!confirm(`Excluir o usuário "${nome}"?\n\nEsta ação remove o usuário, mensagens e assinaturas de push permanentemente.`)) return;
+    const r = await fetch('/admin/excluir-usuario', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id})
+    });
+    const d = await r.json();
+    const msg = document.getElementById('msg');
+    msg.textContent = d.ok ? 'Usuário excluído com sucesso.' : 'Erro: ' + d.erro;
     msg.className = 'msg ' + (d.ok ? 'ok' : 'err');
     msg.style.display = 'block';
     setTimeout(() => msg.style.display = 'none', 3000);

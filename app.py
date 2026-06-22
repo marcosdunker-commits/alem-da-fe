@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 from database import (init_db, salvar_mensagem, buscar_mensagem_hoje, criar_conta,
                       fazer_login, email_existe, salvar_codigo, verificar_codigo,
                       atualizar_senha, salvar_push_subscription, buscar_todas_push_subscriptions,
-                      ativar_premium, verificar_expiracao)
+                      ativar_premium, verificar_expiracao, buscar_usuarios_com_push, buscar_push_do_usuario,
+                      excluir_usuario)
 from ai import gerar_mensagem
 from functools import wraps
 
@@ -53,38 +54,43 @@ def get_periodo_atual():
         return "noite"
 
 
-def enviar_push_para_todos(periodo):
+def gerar_e_enviar_para_todos(tipo):
     try:
         from pywebpush import webpush, WebPushException
-        subs = buscar_todas_push_subscriptions()
-        saudacoes = {"manha": "Bom dia! ☀️", "tarde": "Boa tarde! 🌤️", "noite": "Boa noite! 🌙"}
-        payload = json.dumps({
-            "title": "Além da Fé — Mensagem do dia",
-            "body": f"{saudacoes.get(periodo, '✨')} Sua mensagem especial de hoje está pronta.",
-            "url": "/home"
-        })
-        for sub in subs:
+        usuario_ids = buscar_usuarios_com_push()
+        print(f"Enviando mensagem de {tipo} para {len(usuario_ids)} usuário(s)...")
+        for uid in usuario_ids:
             try:
-                webpush(
-                    subscription_info={
-                        "endpoint": sub["endpoint"],
-                        "keys": {"p256dh": sub["p256dh"], "auth": sub["auth"]}
-                    },
-                    data=payload,
-                    vapid_private_key=VAPID_PRIVATE_KEY,
-                    vapid_claims=VAPID_CLAIMS
-                )
-            except WebPushException as e:
-                print(f"Push falhou para {sub['endpoint'][:40]}: {e}")
+                dados = gerar_mensagem(tipo)
+                salvar_mensagem(tipo, dados, uid)
+                texto_curto = dados.get("texto_versiculo", "")[:100] + "..."
+                payload = json.dumps({
+                    "title": "Além da Fé — Mensagem do dia",
+                    "body": texto_curto,
+                    "url": "/home"
+                })
+                for sub in buscar_push_do_usuario(uid):
+                    try:
+                        webpush(
+                            subscription_info={
+                                "endpoint": sub["endpoint"],
+                                "keys": {"p256dh": sub["p256dh"], "auth": sub["auth"]}
+                            },
+                            data=payload,
+                            vapid_private_key=VAPID_PRIVATE_KEY,
+                            vapid_claims=VAPID_CLAIMS
+                        )
+                    except WebPushException as e:
+                        print(f"Push falhou para usuário {uid}: {e}")
+            except Exception as e:
+                print(f"Erro ao processar usuário {uid}: {e}")
     except Exception as e:
         print(f"Erro geral no push: {e}")
 
 
 def agendar_mensagens():
     scheduler = BackgroundScheduler(timezone=BRASIL_TZ)
-    scheduler.add_job(lambda: enviar_push_para_todos("manha"), "cron", hour=7, minute=0)
-    scheduler.add_job(lambda: enviar_push_para_todos("tarde"), "cron", hour=12, minute=0)
-    scheduler.add_job(lambda: enviar_push_para_todos("noite"), "cron", hour=21, minute=0)
+    scheduler.add_job(lambda: gerar_e_enviar_para_todos("manha"), "cron", hour=7, minute=0)
     scheduler.start()
     return scheduler
 
@@ -129,12 +135,13 @@ def registrar():
     dados = request.get_json()
     nome = dados.get("nome", "").strip()
     email = dados.get("email", "").strip()
+    telefone = dados.get("telefone", "").strip()
     senha = dados.get("senha", "").strip()
-    if not nome or not email or not senha:
+    if not nome or not email or not telefone or not senha:
         return jsonify({"ok": False, "erro": "Preencha todos os campos."})
     if len(senha) < 6:
         return jsonify({"ok": False, "erro": "A senha deve ter pelo menos 6 caracteres."})
-    ok, uid = criar_conta(nome, email, senha)
+    ok, uid = criar_conta(nome, email, telefone, senha)
     if ok:
         ativar_premium(uid, 7, trial=True)
         session["usuario_id"] = uid
@@ -247,6 +254,16 @@ def cadastro():
                            plano=session.get("usuario_plano", "gratuito"))
 
 
+@app.route("/biblia")
+@login_required
+def biblia():
+    if session.get("usuario_plano") != "premium":
+        return redirect(url_for("home") + "?premium=biblia")
+    return render_template("biblia.html",
+                           nome=session.get("usuario_nome", ""),
+                           plano=session.get("usuario_plano", "gratuito"))
+
+
 @app.route("/nova-mensagem")
 @login_required
 def nova_mensagem():
@@ -274,6 +291,10 @@ def criar_pagamento():
     preference_data = {
         "items": [{"title": titulo, "quantity": 1, "unit_price": preco, "currency_id": "BRL"}],
         "payer": {"email": session.get("usuario_email", "")},
+        "payment_methods": {
+            "excluded_payment_types": [],
+            "installments": 1
+        },
         "back_urls": {
             "success": "https://alemdafe.ddns.net/pagamento/sucesso",
             "failure": "https://alemdafe.ddns.net/pagamento/falha",
@@ -358,7 +379,7 @@ def admin_usuarios():
     import sqlite3
     conn = sqlite3.connect(os.path.join(os.path.dirname(__file__), "alem_da_fe.db"))
     conn.row_factory = sqlite3.Row
-    rows = conn.execute("SELECT id, nome, email, plano FROM usuarios ORDER BY criado_em DESC").fetchall()
+    rows = conn.execute("SELECT id, nome, email, telefone, plano FROM usuarios ORDER BY criado_em DESC").fetchall()
     conn.close()
     return jsonify([dict(r) for r in rows])
 
@@ -375,10 +396,22 @@ def admin_mudar_plano():
     return jsonify({"ok": True})
 
 
+@app.route("/admin/excluir-usuario", methods=["POST"])
+def admin_excluir_usuario():
+    if session.get("usuario_email") != ADMIN_EMAIL:
+        return jsonify({"ok": False, "erro": "Sem permissão."})
+    dados = request.get_json()
+    usuario_id = dados.get("id")
+    if not usuario_id or usuario_id == session.get("usuario_id"):
+        return jsonify({"ok": False, "erro": "Operação inválida."})
+    excluir_usuario(usuario_id)
+    return jsonify({"ok": True})
+
+
 if __name__ == "__main__":
     init_db()
     scheduler = agendar_mensagens()
     try:
-        app.run(host="0.0.0.0", port=5050, debug=False, use_reloader=True)
+        app.run(host="0.0.0.0", port=5050, debug=False, use_reloader=False)
     finally:
         scheduler.shutdown()

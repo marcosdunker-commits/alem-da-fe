@@ -5,3 +5,4 @@ pillow
 python-dotenv
 pywebpush
 mercadopago
+paramiko
