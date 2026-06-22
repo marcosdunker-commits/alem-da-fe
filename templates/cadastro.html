@@ -122,7 +122,7 @@
             <button class="btn-desativar" onclick="desativar()">Desativar notificações</button>
         </div>
         <div id="area-sem-suporte" style="display:none;">
-            <p class="aviso-notif" style="color:rgba(255,150,150,0.6);">Seu navegador não suporta notificações push.<br>Tente abrir pelo Chrome.</p>
+            <p class="aviso-notif" style="color:rgba(255,200,100,0.8);" id="msg-sem-suporte"></p>
         </div>
     </div>
 
@@ -224,12 +224,23 @@ function setAtivo(ativo) {
     document.getElementById('area-ativo').style.display = ativo ? 'block' : 'none';
 }
 
+function detectarMsgSemSuporte() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    if (isIOS && !isStandalone) {
+        return 'No iPhone, abra o app pelo Safari e toque em\n"Compartilhar → Adicionar à Tela de Início".\nDepois abra o app instalado e ative as notificações aqui.';
+    }
+    return 'Seu navegador não suporta notificações push.\nTente pelo Chrome ou adicione o app à tela inicial.';
+}
+
 async function verificarStatus() {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
         document.getElementById('area-ativar').style.display = 'none';
         document.getElementById('area-sem-suporte').style.display = 'block';
         document.getElementById('status-badge').className = 'status-badge inativo';
         document.getElementById('status-texto').textContent = 'Não suportado';
+        document.getElementById('msg-sem-suporte').style.whiteSpace = 'pre-line';
+        document.getElementById('msg-sem-suporte').textContent = detectarMsgSemSuporte();
         return;
     }
     try {

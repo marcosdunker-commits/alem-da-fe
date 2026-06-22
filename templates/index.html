@@ -725,9 +725,9 @@
 
         <p style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(201,150,58,0.6);margin-bottom:10px;">Bem-vindo ao Além da Fé</p>
 
-        <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:#f0ead8;line-height:1.4;margin-bottom:12px;">Receba uma palavra de fé<br><em style="color:#e8c46a;font-style:italic;">todos os dias</em></h2>
+        <h2 id="modal-notif-titulo" style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:#f0ead8;line-height:1.4;margin-bottom:12px;">Receba uma palavra de fé<br><em style="color:#e8c46a;font-style:italic;">todos os dias</em></h2>
 
-        <p style="font-size:12px;color:rgba(240,234,216,0.45);line-height:1.9;margin-bottom:28px;font-weight:300;">Ative as notificações e receba mensagens bíblicas diretamente no seu celular, mesmo com o app fechado.</p>
+        <p id="modal-notif-desc" style="font-size:12px;color:rgba(240,234,216,0.45);line-height:1.9;margin-bottom:28px;font-weight:300;">Ative as notificações e receba mensagens bíblicas diretamente no seu celular, mesmo com o app fechado.</p>
 
         <button id="btn-notif-ativar" onclick="ativarNotifBoasVindas()" style="width:100%;padding:16px;background:linear-gradient(135deg,#c9963a,#e8c46a);color:#05080f;border:none;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;margin-bottom:14px;">Ativar notificações</button>
 
@@ -998,13 +998,27 @@ async function ativarNotifBoasVindas() {
 
 async function verificarExibirModalNotif() {
     if (localStorage.getItem('notif_prompt_visto')) return;
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
+    // iOS fora do app instalado: mostra instrução para adicionar à tela inicial
+    if (isIOS && !isStandalone) {
+        setTimeout(() => {
+            document.getElementById('modal-notif-titulo').textContent = 'Instale o app primeiro';
+            document.getElementById('modal-notif-desc').textContent = 'Para receber notificações no iPhone, toque em "Compartilhar" (ícone de seta) e depois em "Adicionar à Tela de Início". Depois abra o app instalado.';
+            document.getElementById('btn-notif-ativar').style.display = 'none';
+            document.getElementById('modal-notif').style.display = 'flex';
+        }, 2000);
+        return;
+    }
+
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
     try {
         const reg = await navigator.serviceWorker.ready;
         const sub = await reg.pushManager.getSubscription();
         if (sub) { localStorage.setItem('notif_prompt_visto', '1'); return; }
     } catch(e) { return; }
-    // Aguarda 2s para não assustar quem acabou de entrar
     setTimeout(() => {
         document.getElementById('modal-notif').style.display = 'flex';
     }, 2000);
