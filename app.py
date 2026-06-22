@@ -17,6 +17,32 @@ from functools import wraps
 load_dotenv()
 
 app = Flask(__name__)
+
+# ── BÍBLIA ──────────────────────────────────────────
+_BIBLIA_PATH = os.path.join(os.path.dirname(__file__), "biblia.json")
+_BIBLIA_DATA = None
+
+def _carregar_biblia():
+    global _BIBLIA_DATA
+    if not os.path.exists(_BIBLIA_PATH):
+        try:
+            import urllib.request
+            print("Baixando Bíblia completa (primeira execução)...")
+            urllib.request.urlretrieve(
+                "https://raw.githubusercontent.com/thiagobodruk/biblia/master/json/pt_aa.json",
+                _BIBLIA_PATH
+            )
+            print("Bíblia baixada com sucesso.")
+        except Exception as e:
+            print(f"Aviso: não foi possível baixar a Bíblia: {e}")
+            return
+    try:
+        with open(_BIBLIA_PATH, encoding="utf-8") as f:
+            _BIBLIA_DATA = json.load(f)
+    except Exception as e:
+        print(f"Erro ao carregar Bíblia: {e}")
+
+_carregar_biblia()
 _secret = os.getenv("SECRET_KEY")
 if not _secret:
     raise RuntimeError("SECRET_KEY não definida no .env")
@@ -322,6 +348,18 @@ def biblia():
     return render_template("biblia.html",
                            nome=session.get("usuario_nome", ""),
                            plano=session.get("usuario_plano", "gratuito"))
+
+
+@app.route("/api/biblia/<int:livro>/<int:capitulo>")
+@login_required
+def api_biblia(livro, capitulo):
+    if _BIBLIA_DATA is None or livro < 0 or livro >= len(_BIBLIA_DATA):
+        return jsonify({"error": "not found"}), 404
+    chapters = _BIBLIA_DATA[livro].get("chapters", [])
+    if capitulo < 1 or capitulo > len(chapters):
+        return jsonify({"error": "not found"}), 404
+    verses = chapters[capitulo - 1]
+    return jsonify({"verses": [{"verse": i + 1, "text": v} for i, v in enumerate(verses)]})
 
 
 @app.route("/nova-mensagem")
