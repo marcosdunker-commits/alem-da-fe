@@ -89,6 +89,11 @@ def init_db():
             criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    try:
+        c.execute("ALTER TABLE usuarios ADD COLUMN fcm_token TEXT")
+        conn.commit()
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
@@ -313,6 +318,18 @@ def buscar_premium_sem_horario_com_push():
     """).fetchall()
     conn.close()
     return [r[0] for r in rows]
+
+def salvar_fcm_token(usuario_id, token):
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("UPDATE usuarios SET fcm_token=? WHERE id=?", (token, usuario_id))
+    conn.commit()
+    conn.close()
+
+def buscar_fcm_token(usuario_id):
+    conn = sqlite3.connect(DB_PATH)
+    row = conn.execute("SELECT fcm_token FROM usuarios WHERE id=?", (usuario_id,)).fetchone()
+    conn.close()
+    return row[0] if row else None
 
 def excluir_push_subscription(endpoint):
     conn = sqlite3.connect(DB_PATH)

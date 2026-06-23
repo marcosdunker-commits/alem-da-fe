@@ -11,7 +11,7 @@ from database import (init_db, salvar_mensagem, buscar_mensagem_hoje, criar_cont
                       ativar_premium, verificar_expiracao, buscar_usuarios_com_push, buscar_push_do_usuario,
                       excluir_usuario, excluir_push_subscription, excluir_todas_push_do_usuario,
                       salvar_horarios, buscar_horarios, buscar_premium_com_push_na_hora, buscar_free_com_push,
-                      buscar_premium_sem_horario_com_push)
+                      buscar_premium_sem_horario_com_push, salvar_fcm_token, buscar_fcm_token)
 from ai import gerar_mensagem
 from functools import wraps
 
@@ -99,14 +99,52 @@ def get_periodo_atual():
         return "noite"
 
 
+_firebase_app = None
+
+def _get_firebase_app():
+    global _firebase_app
+    creds_path = os.getenv("FIREBASE_CREDENTIALS")
+    if not creds_path or not os.path.exists(creds_path):
+        return None
+    if _firebase_app:
+        return _firebase_app
+    try:
+        import firebase_admin
+        from firebase_admin import credentials
+        cred = credentials.Certificate(creds_path)
+        _firebase_app = firebase_admin.initialize_app(cred)
+        return _firebase_app
+    except Exception as e:
+        print(f"Firebase init erro: {e}")
+        return None
+
+def _enviar_fcm(fcm_token, titulo, corpo):
+    if not _get_firebase_app():
+        return
+    try:
+        from firebase_admin import messaging
+        msg = messaging.Message(
+            notification=messaging.Notification(title=titulo, body=corpo),
+            token=fcm_token,
+            apns=messaging.APNSConfig(payload=messaging.APNSPayload(
+                aps=messaging.Aps(sound="default")
+            ))
+        )
+        messaging.send(msg)
+        print(f"FCM enviado: {fcm_token[:20]}...")
+    except Exception as e:
+        print(f"FCM erro: {e}")
+
 def _enviar_push_para_lista(uids, tipo):
     from pywebpush import webpush, WebPushException
     for uid in uids:
         try:
             dados = gerar_mensagem(tipo)
             salvar_mensagem(tipo, dados, uid)
+            titulo = "Além da Fé — Mensagem do dia"
             texto_curto = dados.get("texto_versiculo", "")[:100] + "..."
-            payload = json.dumps({"title": "Além da Fé — Mensagem do dia", "body": texto_curto, "url": "/home"})
+            payload = json.dumps({"title": titulo, "body": texto_curto, "url": "/home"})
+            # Web push (browser)
             for sub in buscar_push_do_usuario(uid):
                 try:
                     webpush(
@@ -121,6 +159,10 @@ def _enviar_push_para_lista(uids, tipo):
                         excluir_push_subscription(sub["endpoint"])
                     else:
                         print(f"Push falhou para usuário {uid}: {e}")
+            # FCM push (iOS app)
+            fcm_token = buscar_fcm_token(uid)
+            if fcm_token:
+                _enviar_fcm(fcm_token, titulo, texto_curto)
         except Exception as e:
             print(f"Erro ao processar usuário {uid}: {e}")
 
@@ -486,6 +528,22 @@ def subscribe_push():
     if endpoint and p256dh and auth:
         salvar_push_subscription(session["usuario_id"], endpoint, p256dh, auth)
     return jsonify({"ok": True})
+
+
+@app.route("/subscribe-push-ios", methods=["POST"])
+@login_required
+def subscribe_push_ios():
+    data = request.get_json()
+    token = data.get("token", "").strip()
+    salvar_fcm_token(session["usuario_id"], token if token else None)
+    return jsonify({"ok": True})
+
+
+@app.route("/status-push-ios")
+@login_required
+def status_push_ios():
+    token = buscar_fcm_token(session["usuario_id"])
+    return jsonify({"ativo": bool(token)})
 
 
 ADMIN_EMAIL = "marcosdunker@gmail.com"

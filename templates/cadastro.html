@@ -198,6 +198,7 @@
 <script>
 const VAPID_PUBLIC_KEY = '{{ vapid_public_key }}';
 const PLANO = '{{ plano }}';
+const IS_IOS_APP = !!(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers['push-permission-request']);
 
 function urlBase64ToUint8Array(b64) {
     const pad = '='.repeat((4 - b64.length % 4) % 4);
@@ -222,25 +223,29 @@ function setAtivo(ativo) {
     document.getElementById('status-texto').textContent = ativo ? 'Notificações ativas' : 'Notificações desativadas';
     document.getElementById('area-ativar').style.display = ativo ? 'none' : 'block';
     document.getElementById('area-ativo').style.display = ativo ? 'block' : 'none';
-}
-
-function detectarMsgSemSuporte() {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-    if (isIOS && !isStandalone) {
-        return 'No iPhone, abra o app pelo Safari e toque em\n"Compartilhar → Adicionar à Tela de Início".\nDepois abra o app instalado e ative as notificações aqui.';
-    }
-    return 'Seu navegador não suporta notificações push.\nTente pelo Chrome ou adicione o app à tela inicial.';
+    document.getElementById('area-sem-suporte').style.display = 'none';
 }
 
 async function verificarStatus() {
+    if (IS_IOS_APP) {
+        try {
+            const r = await fetch('/status-push-ios');
+            const d = await r.json();
+            setAtivo(d.ativo);
+        } catch(e) { setAtivo(false); }
+        return;
+    }
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
         document.getElementById('area-ativar').style.display = 'none';
         document.getElementById('area-sem-suporte').style.display = 'block';
         document.getElementById('status-badge').className = 'status-badge inativo';
         document.getElementById('status-texto').textContent = 'Não suportado';
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
         document.getElementById('msg-sem-suporte').style.whiteSpace = 'pre-line';
-        document.getElementById('msg-sem-suporte').textContent = detectarMsgSemSuporte();
+        document.getElementById('msg-sem-suporte').textContent = (isIOS && !isStandalone)
+            ? 'No iPhone, abra pelo Safari e toque em\n"Compartilhar → Adicionar à Tela de Início".\nDepois abra o app instalado e ative aqui.'
+            : 'Seu navegador não suporta notificações push.\nTente pelo Chrome ou adicione o app à tela inicial.';
         return;
     }
     try {
@@ -252,6 +257,7 @@ async function verificarStatus() {
 }
 
 async function ativar() {
+    if (IS_IOS_APP) { ativarIOS(); return; }
     const btn = document.getElementById('btn-ativar');
     btn.textContent = 'Aguardando permissão...';
     btn.disabled = true;
@@ -275,7 +281,55 @@ async function ativar() {
     }
 }
 
+function ativarIOS() {
+    const btn = document.getElementById('btn-ativar');
+    btn.textContent = 'Aguardando permissão...';
+    btn.disabled = true;
+
+    function onPermission(e) {
+        window.removeEventListener('push-permission-request', onPermission);
+        if (e.detail === 'granted') {
+            window.addEventListener('push-token', onToken);
+            window.webkit.messageHandlers['push-token'].postMessage(null);
+        } else {
+            btn.textContent = 'Ativar notificações';
+            btn.disabled = false;
+            mostrarMsg('Permissão negada. Habilite em Configurações → Além da Fé → Notificações.', 'err');
+        }
+    }
+
+    function onToken(e) {
+        window.removeEventListener('push-token', onToken);
+        const token = e.detail;
+        if (!token || token === 'ERROR GET TOKEN') {
+            btn.textContent = 'Ativar notificações';
+            btn.disabled = false;
+            mostrarMsg('Erro ao obter token. Tente reinstalar o app.', 'err');
+            return;
+        }
+        fetch('/subscribe-push-ios', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token })
+        }).then(r => r.json()).then(d => {
+            if (d.ok) {
+                setAtivo(true);
+                mostrarMsg('Notificações ativadas! Você receberá sua mensagem bíblica diária.', 'ok');
+            }
+        }).catch(() => mostrarMsg('Erro ao salvar. Tente novamente.', 'err'));
+    }
+
+    window.addEventListener('push-permission-request', onPermission);
+    window.webkit.messageHandlers['push-permission-request'].postMessage(null);
+}
+
 async function desativar() {
+    if (IS_IOS_APP) {
+        await fetch('/subscribe-push-ios', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({token: ''}) });
+        setAtivo(false);
+        mostrarMsg('Notificações desativadas.', 'ok');
+        return;
+    }
     try {
         const reg = await navigator.serviceWorker.ready;
         const sub = await reg.pushManager.getSubscription();
