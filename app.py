@@ -591,6 +591,42 @@ def admin_excluir_usuario():
     return jsonify({"ok": True})
 
 
+@app.route("/admin/teste-push", methods=["POST"])
+def admin_teste_push():
+    if session.get("usuario_email") != ADMIN_EMAIL:
+        return jsonify({"ok": False, "erro": "Sem permissão."})
+    dados = request.get_json()
+    uid = dados.get("usuario_id")
+    if not uid:
+        return jsonify({"ok": False, "erro": "usuario_id obrigatório."})
+    resultados = []
+    from pywebpush import webpush, WebPushException
+    titulo = "Além da Fé — Teste"
+    corpo = "Esta é uma notificação de teste enviada pelo admin."
+    payload = json.dumps({"title": titulo, "body": corpo, "url": "/home"})
+    for sub in buscar_push_do_usuario(uid):
+        try:
+            webpush(
+                subscription_info={"endpoint": sub["endpoint"], "keys": {"p256dh": sub["p256dh"], "auth": sub["auth"]}},
+                data=payload,
+                vapid_private_key=VAPID_PRIVATE_KEY,
+                vapid_claims=VAPID_CLAIMS
+            )
+            resultados.append({"tipo": "web", "ok": True})
+        except WebPushException as e:
+            resultados.append({"tipo": "web", "ok": False, "erro": str(e)})
+    fcm_token = buscar_fcm_token(uid)
+    if fcm_token:
+        try:
+            _enviar_fcm(fcm_token, titulo, corpo)
+            resultados.append({"tipo": "fcm", "ok": True})
+        except Exception as e:
+            resultados.append({"tipo": "fcm", "ok": False, "erro": str(e)})
+    else:
+        resultados.append({"tipo": "fcm", "ok": False, "erro": "sem token FCM"})
+    return jsonify({"ok": True, "resultados": resultados})
+
+
 if __name__ == "__main__":
     init_db()
     scheduler = agendar_mensagens()
