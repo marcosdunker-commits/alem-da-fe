@@ -61,15 +61,19 @@ ENCORAJAMENTO: [frase final de encorajamento]"""
 def parsear_mensagem(texto, emoji):
     linhas = texto.strip().split("\n")
     dados = {"emoji": emoji, "versiculo": "", "texto_versiculo": "", "reflexao": "", "encorajamento": ""}
+    campo_atual = None
+    CAMPOS = {"VERSICULO:": "versiculo", "TEXTO_VERSICULO:": "texto_versiculo",
+               "REFLEXAO:": "reflexao", "ENCORAJAMENTO:": "encorajamento"}
 
     for linha in linhas:
-        if linha.startswith("VERSICULO:"):
-            dados["versiculo"] = linha.replace("VERSICULO:", "").strip()
-        elif linha.startswith("TEXTO_VERSICULO:"):
-            dados["texto_versiculo"] = linha.replace("TEXTO_VERSICULO:", "").strip()
-        elif linha.startswith("REFLEXAO:"):
-            dados["reflexao"] = linha.replace("REFLEXAO:", "").strip()
-        elif linha.startswith("ENCORAJAMENTO:"):
-            dados["encorajamento"] = linha.replace("ENCORAJAMENTO:", "").strip()
+        matched = False
+        for prefixo, chave in CAMPOS.items():
+            if linha.startswith(prefixo):
+                dados[chave] = linha[len(prefixo):].strip()
+                campo_atual = chave
+                matched = True
+                break
+        if not matched and campo_atual and linha.strip():
+            dados[campo_atual] += " " + linha.strip()
 
     return dados

@@ -28,25 +28,32 @@ def _carregar_biblia():
     if not os.path.exists(_BIBLIA_PATH):
         import urllib.request
         urls = [
-            "https://raw.githubusercontent.com/thiagobodruk/biblia/main/json/pt_aa.json",
             "https://raw.githubusercontent.com/thiagobodruk/biblia/master/json/pt_aa.json",
+            "https://raw.githubusercontent.com/thiagobodruk/biblia/main/json/pt_aa.json",
+            "https://raw.githubusercontent.com/thiagobodruk/biblia/master/json/pt-br.json",
+            "https://cdn.jsdelivr.net/gh/thiagobodruk/biblia@master/json/pt_aa.json",
         ]
         baixado = False
         for url in urls:
             try:
-                print(f"Baixando Bíblia completa de {url}...")
-                urllib.request.urlretrieve(url, _BIBLIA_PATH)
+                print(f"Baixando Bíblia de {url}...")
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    data = resp.read()
+                with open(_BIBLIA_PATH, "wb") as f:
+                    f.write(data)
                 print("Bíblia baixada com sucesso.")
                 baixado = True
                 break
             except Exception as e:
                 print(f"Falhou ({url}): {e}")
         if not baixado:
-            print("Aviso: Bíblia não pôde ser baixada.")
+            print("Aviso: Bíblia não pôde ser baixada. Usando API externa por capítulo.")
             return
     try:
         with open(_BIBLIA_PATH, encoding="utf-8") as f:
             _BIBLIA_DATA = json.load(f)
+        print(f"Bíblia carregada: {len(_BIBLIA_DATA)} livros.")
     except Exception as e:
         print(f"Erro ao carregar Bíblia: {e}")
 

@@ -1,9 +1,7 @@
 flask
 groq
 apscheduler
-pillow
 python-dotenv
 pywebpush
 mercadopago
-paramiko
 bcrypt
