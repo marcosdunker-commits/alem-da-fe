@@ -103,15 +103,16 @@ _firebase_app = None
 
 def _get_firebase_app():
     global _firebase_app
-    creds_path = os.getenv("FIREBASE_CREDENTIALS")
-    if not creds_path or not os.path.exists(creds_path):
-        return None
     if _firebase_app:
         return _firebase_app
+    b64 = os.getenv("FIREBASE_CREDENTIALS_B64")
+    if not b64:
+        return None
     try:
-        import firebase_admin
+        import base64, json, firebase_admin
         from firebase_admin import credentials
-        cred = credentials.Certificate(creds_path)
+        cred_dict = json.loads(base64.b64decode(b64).decode("utf-8"))
+        cred = credentials.Certificate(cred_dict)
         _firebase_app = firebase_admin.initialize_app(cred)
         return _firebase_app
     except Exception as e:
