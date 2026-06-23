@@ -595,10 +595,17 @@ def admin_excluir_usuario():
 def admin_teste_push():
     if session.get("usuario_email") != ADMIN_EMAIL:
         return jsonify({"ok": False, "erro": "Sem permissão."})
-    dados = request.get_json()
+    dados = request.get_json() or {}
     uid = dados.get("usuario_id")
     if not uid:
-        return jsonify({"ok": False, "erro": "usuario_id obrigatório."})
+        email = dados.get("email") or session.get("usuario_email")
+        import sqlite3
+        conn = sqlite3.connect(os.path.join(os.path.dirname(__file__), "alem_da_fe.db"))
+        row = conn.execute("SELECT id FROM usuarios WHERE email=?", (email,)).fetchone()
+        conn.close()
+        if not row:
+            return jsonify({"ok": False, "erro": "Usuário não encontrado."})
+        uid = row[0]
     resultados = []
     from pywebpush import webpush, WebPushException
     titulo = "Além da Fé — Teste"

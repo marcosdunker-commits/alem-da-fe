@@ -81,6 +81,7 @@ async function carregar() {
                     : `<button class="btn-downgrade" onclick="mudarPlano(${u.id},'gratuito')">Revogar</button>`
                 }
                 <button class="btn-delete" onclick="excluirUsuario(${u.id}, '${u.nome}')">Excluir</button>
+                <button class="btn-downgrade" onclick="testarPush(${u.id})" style="margin-left:6px">Testar Push</button>
             </td>
         </tr>`;
     });
