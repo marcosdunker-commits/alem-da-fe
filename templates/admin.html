@@ -118,6 +118,30 @@ async function excluirUsuario(id, nome) {
     if (d.ok) carregar();
 }
 
+async function testarPush(id) {
+    const r = await fetch('/admin/teste-push', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({usuario_id: id})
+    });
+    const d = await r.json();
+    const msg = document.getElementById('msg');
+    if (d.ok) {
+        const fcm = d.resultados.find(x => x.tipo === 'fcm');
+        const web = d.resultados.find(x => x.tipo === 'web');
+        const partes = [];
+        if (fcm) partes.push('FCM(iOS): ' + (fcm.ok ? '✓ enviado' : '✗ ' + fcm.erro));
+        if (web) partes.push('Web: ' + (web.ok ? '✓ enviado' : '✗ ' + web.erro));
+        msg.textContent = partes.join(' | ');
+        msg.className = 'msg ok';
+    } else {
+        msg.textContent = 'Erro: ' + d.erro;
+        msg.className = 'msg err';
+    }
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 6000);
+}
+
 carregar();
 </script>
 </body>
