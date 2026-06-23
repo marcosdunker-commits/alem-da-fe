@@ -290,7 +290,7 @@ function ativarIOS() {
         window.removeEventListener('push-permission-request', onPermission);
         if (e.detail === 'granted') {
             window.addEventListener('push-token', onToken);
-            window.webkit.messageHandlers['push-token'].postMessage(null);
+            window.webkit.messageHandlers.pushToken.postMessage(null);
         } else {
             btn.textContent = 'Ativar notificações';
             btn.disabled = false;
@@ -321,7 +321,7 @@ function ativarIOS() {
 
     window.addEventListener('push-permission-request', onPermission);
     try {
-        window.webkit.messageHandlers['push-permission-request'].postMessage(null);
+        window.webkit.messageHandlers.pushPermissionRequest.postMessage(null);
     } catch(e) {
         window.removeEventListener('push-permission-request', onPermission);
         btn.textContent = 'Ativar notificações';
