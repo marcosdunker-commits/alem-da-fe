@@ -282,10 +282,6 @@ async function ativar() {
 }
 
 function ativarIOS() {
-    if (!window.webkit || !window.webkit.messageHandlers || !window.webkit.messageHandlers['push-permission-request']) {
-        mostrarMsg('Atualize o app para a versão mais recente.', 'err');
-        return;
-    }
     const btn = document.getElementById('btn-ativar');
     btn.textContent = 'Aguardando permissão...';
     btn.disabled = true;
@@ -324,7 +320,14 @@ function ativarIOS() {
     }
 
     window.addEventListener('push-permission-request', onPermission);
-    window.webkit.messageHandlers['push-permission-request'].postMessage(null);
+    try {
+        window.webkit.messageHandlers['push-permission-request'].postMessage(null);
+    } catch(e) {
+        window.removeEventListener('push-permission-request', onPermission);
+        btn.textContent = 'Ativar notificações';
+        btn.disabled = false;
+        mostrarMsg('Erro ao comunicar com o app. Tente reabrir.', 'err');
+    }
 }
 
 async function desativar() {
