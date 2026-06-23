@@ -198,8 +198,7 @@
 <script>
 const VAPID_PUBLIC_KEY = '{{ vapid_public_key }}';
 const PLANO = '{{ plano }}';
-const IS_IOS_APP = document.cookie.includes('app-platform=iOS App Store') ||
-    !!(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers['push-permission-request']);
+const IS_IOS_APP = navigator.userAgent.includes('PWAShell');
 
 function urlBase64ToUint8Array(b64) {
     const pad = '='.repeat((4 - b64.length % 4) % 4);
