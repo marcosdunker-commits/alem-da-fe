@@ -35,21 +35,6 @@
         .card { background: linear-gradient(160deg, #0e1420, #111827); border: 1px solid rgba(201,150,58,0.15); padding: 28px 24px; position: relative; margin-bottom: 14px; }
         .card::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px; background: linear-gradient(to right, transparent, rgba(201,150,58,0.6), transparent); }
 
-        /* STATUS */
-        .status-area { text-align: center; margin-bottom: 20px; }
-        .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
-        .status-badge.ativo { background: rgba(50,180,50,0.1); border: 1px solid rgba(50,180,50,0.3); color: #90ff90; }
-        .status-badge.inativo { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: rgba(240,234,216,0.35); }
-        .status-badge .dot { width: 7px; height: 7px; border-radius: 50%; }
-        .status-badge.ativo .dot { background: #90ff90; box-shadow: 0 0 6px #90ff90; }
-        .status-badge.inativo .dot { background: rgba(240,234,216,0.2); }
-
-        .btn-ativar { width: 100%; padding: 15px; background: linear-gradient(135deg, #c9963a, #e8c46a); color: #05080f; border: none; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: .2s; }
-        .btn-ativar:hover { opacity: .85; }
-        .btn-desativar { width: 100%; padding: 13px; background: transparent; border: 1px solid rgba(180,50,50,0.4); color: rgba(255,120,120,0.7); font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: .2s; margin-top: 10px; }
-        .btn-desativar:hover { background: rgba(180,50,50,0.1); color: #ff9090; }
-        .aviso-notif { font-size: 10px; color: rgba(240,234,216,0.3); text-align: center; margin-top: 12px; line-height: 1.8; }
-
         /* HORÁRIO FREE */
         .horario-fixo { text-align: center; padding: 20px 0; }
         .horario-fixo .hora { font-size: 52px; font-weight: 700; color: #e8c46a; letter-spacing: 4px; text-shadow: 0 0 30px rgba(232,196,106,0.4); }
@@ -95,36 +80,15 @@
 
 <main>
     <div class="page-top">
-        <h1>Notificações <em>diárias</em></h1>
+        <h1>Horários de <em>envio</em></h1>
         {% if plano == 'premium' %}
         <p>Escolha até 3 horários para receber<br>sua palavra de fé todos os dias.</p>
         {% else %}
-        <p>Receba sua palavra de fé todos os dias<br>diretamente no seu celular.</p>
+        <p>Sua mensagem bíblica diária chega todo dia às 7h.<br>Assine o Premium para personalizar os horários.</p>
         {% endif %}
     </div>
 
     <div class="msg" id="msg"></div>
-
-    <!-- CARD NOTIFICAÇÕES (todos) -->
-    <div class="card">
-        <div class="status-area">
-            <div class="status-badge inativo" id="status-badge">
-                <span class="dot"></span>
-                <span id="status-texto">Verificando...</span>
-            </div>
-        </div>
-
-        <div id="area-ativar">
-            <button class="btn-ativar" id="btn-ativar" onclick="ativar()">Ativar notificações</button>
-            <p class="aviso-notif" id="aviso-notif">Você precisará permitir notificações no seu navegador.</p>
-        </div>
-        <div id="area-ativo" style="display:none;">
-            <button class="btn-desativar" onclick="desativar()">Desativar notificações</button>
-        </div>
-        <div id="area-sem-suporte" style="display:none;">
-            <p class="aviso-notif" style="color:rgba(255,200,100,0.8);" id="msg-sem-suporte"></p>
-        </div>
-    </div>
 
     {% if plano == 'premium' %}
     <!-- CARD HORÁRIOS PREMIUM -->
@@ -196,22 +160,7 @@
 </div>
 
 <script>
-const VAPID_PUBLIC_KEY = '{{ vapid_public_key }}';
 const PLANO = '{{ plano }}';
-const IS_IOS_APP = navigator.userAgent.includes('PWAShell');
-if (IS_IOS_APP) {
-    const aviso = document.getElementById('aviso-notif');
-    if (aviso) aviso.textContent = 'Ao clicar, o iPhone pedirá permissão para enviar notificações.';
-}
-
-function urlBase64ToUint8Array(b64) {
-    const pad = '='.repeat((4 - b64.length % 4) % 4);
-    const base64 = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
-    const raw = atob(base64);
-    const arr = new Uint8Array(raw.length);
-    for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
-    return arr;
-}
 
 function mostrarMsg(texto, tipo) {
     const el = document.getElementById('msg');
@@ -219,120 +168,6 @@ function mostrarMsg(texto, tipo) {
     el.className = 'msg ' + tipo;
     el.style.display = 'block';
     setTimeout(() => el.style.display = 'none', 4000);
-}
-
-function setAtivo(ativo) {
-    const badge = document.getElementById('status-badge');
-    badge.className = 'status-badge ' + (ativo ? 'ativo' : 'inativo');
-    document.getElementById('status-texto').textContent = ativo ? 'Notificações ativas' : 'Notificações desativadas';
-    document.getElementById('area-ativar').style.display = ativo ? 'none' : 'block';
-    document.getElementById('area-ativo').style.display = ativo ? 'block' : 'none';
-    document.getElementById('area-sem-suporte').style.display = 'none';
-}
-
-async function verificarStatus() {
-    if (IS_IOS_APP) {
-        try {
-            const r = await fetch('/status-push-ios');
-            const d = await r.json();
-            setAtivo(d.ativo);
-        } catch(e) { setAtivo(false); }
-        return;
-    }
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        document.getElementById('area-ativar').style.display = 'none';
-        document.getElementById('area-sem-suporte').style.display = 'block';
-        document.getElementById('status-badge').className = 'status-badge inativo';
-        document.getElementById('status-texto').textContent = 'Não suportado';
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-        document.getElementById('msg-sem-suporte').style.whiteSpace = 'pre-line';
-        document.getElementById('msg-sem-suporte').textContent = (isIOS && !isStandalone)
-            ? 'No iPhone, abra pelo Safari e toque em\n"Compartilhar → Adicionar à Tela de Início".\nDepois abra o app instalado e ative aqui.'
-            : 'Seu navegador não suporta notificações push.\nTente pelo Chrome ou adicione o app à tela inicial.';
-        return;
-    }
-    try {
-        const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-        await navigator.serviceWorker.ready;
-        const sub = await reg.pushManager.getSubscription();
-        setAtivo(!!sub);
-    } catch(e) { setAtivo(false); }
-}
-
-async function ativar() {
-    if (IS_IOS_APP) { ativarIOS(); return; }
-    const btn = document.getElementById('btn-ativar');
-    btn.textContent = 'Aguardando permissão...';
-    btn.disabled = true;
-    const perm = await Notification.requestPermission();
-    if (perm !== 'granted') {
-        btn.textContent = 'Ativar notificações';
-        btn.disabled = false;
-        mostrarMsg('Permissão negada. Habilite nas configurações do navegador.', 'err');
-        return;
-    }
-    try {
-        const reg = await navigator.serviceWorker.ready;
-        const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
-        await fetch('/subscribe-push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sub) });
-        setAtivo(true);
-        mostrarMsg('Notificações ativadas! Você receberá sua mensagem nos horários cadastrados.', 'ok');
-    } catch(e) {
-        btn.textContent = 'Ativar notificações';
-        btn.disabled = false;
-        mostrarMsg('Erro ao ativar. Tente novamente.', 'err');
-    }
-}
-
-function ativarIOS() {
-    const btn = document.getElementById('btn-ativar');
-    btn.textContent = 'Aguardando permissão...';
-    btn.disabled = true;
-
-    let tentativas = 0;
-    const poll = setInterval(async () => {
-        tentativas++;
-        try {
-            const r = await fetch('/status-push-ios');
-            const d = await r.json();
-            if (d.ativo) {
-                clearInterval(poll);
-                setAtivo(true);
-                mostrarMsg('Notificações ativadas! Você receberá sua mensagem bíblica diária.', 'ok');
-                return;
-            }
-        } catch(e) {}
-        if (tentativas >= 15) {
-            clearInterval(poll);
-            btn.textContent = 'Ativar notificações';
-            btn.disabled = false;
-            mostrarMsg('Permissão negada ou não concedida. Verifique Configurações → Além da Fé → Notificações.', 'err');
-        }
-    }, 2000);
-
-    const fr = document.createElement('iframe');
-    fr.style.display = 'none';
-    fr.src = 'alemdafe://push-permission-request';
-    document.body.appendChild(fr);
-    setTimeout(() => fr.remove(), 1000);
-}
-
-async function desativar() {
-    if (IS_IOS_APP) {
-        await fetch('/subscribe-push-ios', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({token: ''}) });
-        setAtivo(false);
-        mostrarMsg('Notificações desativadas.', 'ok');
-        return;
-    }
-    try {
-        const reg = await navigator.serviceWorker.ready;
-        const sub = await reg.pushManager.getSubscription();
-        if (sub) await sub.unsubscribe();
-        await fetch('/desativar-push', { method: 'POST' });
-        setAtivo(false);
-        mostrarMsg('Notificações desativadas.', 'ok');
-    } catch(e) { mostrarMsg('Erro ao desativar.', 'err'); }
 }
 
 // PREMIUM — horários
@@ -397,8 +232,6 @@ async function assinar(plano) {
 function mostrarPremium() {
     document.getElementById('modal-premium').style.display = 'flex';
 }
-
-verificarStatus();
 </script>
 </body>
 </html>
