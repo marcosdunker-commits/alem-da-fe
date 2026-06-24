@@ -1008,7 +1008,7 @@ async function ativarNotif() {
     try {
         const reg = await navigator.serviceWorker.ready;
         const sub = await reg.pushManager.getSubscription();
-        if (sub) { mostrarToast('Notificações já ativas ✓'); return; }
+        if (sub) await sub.unsubscribe();
         const perm = await Notification.requestPermission();
         if (perm !== 'granted') { mostrarToast('Permissão negada.'); return; }
         const newSub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });

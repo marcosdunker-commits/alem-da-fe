@@ -78,7 +78,7 @@ def inject_version():
 
 BRASIL_TZ = ZoneInfo("America/Sao_Paulo")
 VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "")
-VAPID_PRIVATE_KEY = os.path.join(os.path.dirname(__file__), "vapid_private.pem")
+VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY_B64", "")
 VAPID_CLAIMS = {"sub": "mailto:marcosdunker@gmail.com"}
 
 
