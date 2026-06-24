@@ -983,21 +983,22 @@ async function ativarNotif() {
             const d = await r.json().catch(() => ({}));
             if (d.ativo) { mostrarToast('Notificações já ativas ✓'); return; }
         }
-        const fr = document.createElement('iframe');
-        fr.style.display = 'none';
-        fr.src = 'alemdafe://push-permission-request';
-        document.body.appendChild(fr);
-        setTimeout(() => fr.remove(), 1000);
-        let tries = 0;
-        const poll = setInterval(async () => {
-            tries++;
-            try {
-                const res = await fetch('/status-push-ios');
-                const d = await res.json();
-                if (d.ativo) { clearInterval(poll); mostrarToast('Notificações ativadas ✓'); return; }
-            } catch(e) {}
-            if (tries >= 15) { clearInterval(poll); mostrarToast('Permissão negada. Verifique Configurações → Além da Fé.'); }
-        }, 2000);
+        try {
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.pushPermissionRequest) {
+                window.webkit.messageHandlers.pushPermissionRequest.postMessage(null);
+            } else {
+                window.location.href = 'alemdafe://push-permission-request';
+            }
+        } catch(e) {
+            window.location.href = 'alemdafe://push-permission-request';
+        }
+        setTimeout(async () => {
+            const res = await fetch('/status-push-ios').catch(() => null);
+            if (res) {
+                const d = await res.json().catch(() => ({}));
+                mostrarToast(d.ativo ? 'Notificações ativadas ✓' : 'Permissão concedida! Aguarde alguns instantes.');
+            }
+        }, 3000);
         return;
     }
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
