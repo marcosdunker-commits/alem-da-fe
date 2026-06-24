@@ -109,6 +109,7 @@ def _get_firebase_app():
         return _firebase_app
     b64 = os.getenv("FIREBASE_CREDENTIALS_B64")
     if not b64:
+        print("[FCM] FIREBASE_CREDENTIALS_B64 não definida no .env — FCM desativado")
         return None
     try:
         import base64, json, firebase_admin
@@ -116,13 +117,15 @@ def _get_firebase_app():
         cred_dict = json.loads(base64.b64decode(b64).decode("utf-8"))
         cred = credentials.Certificate(cred_dict)
         _firebase_app = firebase_admin.initialize_app(cred)
+        print("[FCM] Firebase inicializado com sucesso")
         return _firebase_app
     except Exception as e:
-        print(f"Firebase init erro: {e}")
+        print(f"[FCM] Firebase init erro: {e}")
         return None
 
 def _enviar_fcm(fcm_token, titulo, corpo):
     if not _get_firebase_app():
+        print("[FCM] Firebase não inicializado — não foi possível enviar")
         return
     try:
         from firebase_admin import messaging
@@ -134,9 +137,9 @@ def _enviar_fcm(fcm_token, titulo, corpo):
             ))
         )
         messaging.send(msg)
-        print(f"FCM enviado: {fcm_token[:20]}...")
+        print(f"[FCM] ✓ Enviado para token {fcm_token[:20]}...")
     except Exception as e:
-        print(f"FCM erro: {e}")
+        print(f"[FCM] ✗ Erro ao enviar: {e}")
 
 def _enviar_push_para_lista(uids, tipo):
     from pywebpush import webpush, WebPushException
@@ -166,6 +169,8 @@ def _enviar_push_para_lista(uids, tipo):
             fcm_token = buscar_fcm_token(uid)
             if fcm_token:
                 _enviar_fcm(fcm_token, titulo, texto_curto)
+            else:
+                print(f"[FCM] Sem token para usuário {uid} — notificação iOS não enviada")
         except Exception as e:
             print(f"Erro ao processar usuário {uid}: {e}")
 

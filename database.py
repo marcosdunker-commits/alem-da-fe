@@ -286,11 +286,14 @@ def buscar_horarios(usuario_id):
 def buscar_premium_com_push_na_hora(hora):
     conn = sqlite3.connect(DB_PATH)
     rows = conn.execute("""
-        SELECT DISTINCT ps.usuario_id
-        FROM push_subscriptions ps
-        JOIN usuarios u ON u.id = ps.usuario_id
-        JOIN horarios_notificacao hn ON hn.usuario_id = ps.usuario_id
+        SELECT DISTINCT u.id
+        FROM usuarios u
+        JOIN horarios_notificacao hn ON hn.usuario_id = u.id
         WHERE u.plano = 'premium' AND hn.hora = ?
+        AND (
+            EXISTS (SELECT 1 FROM push_subscriptions ps WHERE ps.usuario_id = u.id)
+            OR (u.fcm_token IS NOT NULL AND u.fcm_token != '')
+        )
     """, (hora,)).fetchall()
     conn.close()
     return [r[0] for r in rows]
@@ -298,10 +301,13 @@ def buscar_premium_com_push_na_hora(hora):
 def buscar_free_com_push():
     conn = sqlite3.connect(DB_PATH)
     rows = conn.execute("""
-        SELECT DISTINCT ps.usuario_id
-        FROM push_subscriptions ps
-        JOIN usuarios u ON u.id = ps.usuario_id
+        SELECT DISTINCT u.id
+        FROM usuarios u
         WHERE u.plano != 'premium'
+        AND (
+            EXISTS (SELECT 1 FROM push_subscriptions ps WHERE ps.usuario_id = u.id)
+            OR (u.fcm_token IS NOT NULL AND u.fcm_token != '')
+        )
     """).fetchall()
     conn.close()
     return [r[0] for r in rows]
@@ -310,11 +316,14 @@ def buscar_premium_sem_horario_com_push():
     """Premium que não cadastrou horários → recebe às 7h como padrão."""
     conn = sqlite3.connect(DB_PATH)
     rows = conn.execute("""
-        SELECT DISTINCT ps.usuario_id
-        FROM push_subscriptions ps
-        JOIN usuarios u ON u.id = ps.usuario_id
+        SELECT DISTINCT u.id
+        FROM usuarios u
         WHERE u.plano = 'premium'
-        AND ps.usuario_id NOT IN (SELECT usuario_id FROM horarios_notificacao)
+        AND u.id NOT IN (SELECT usuario_id FROM horarios_notificacao)
+        AND (
+            EXISTS (SELECT 1 FROM push_subscriptions ps WHERE ps.usuario_id = u.id)
+            OR (u.fcm_token IS NOT NULL AND u.fcm_token != '')
+        )
     """).fetchall()
     conn.close()
     return [r[0] for r in rows]
