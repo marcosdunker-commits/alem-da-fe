@@ -326,7 +326,7 @@ function ativarIOS() {
         window.removeEventListener('push-permission-request', onPermission);
         btn.textContent = 'Ativar notificações';
         btn.disabled = false;
-        mostrarMsg('Erro ao comunicar com o app. Tente reabrir.', 'err');
+        mostrarMsg('DEBUG: ' + e.name + ': ' + e.message, 'err');
     }
 }
 
