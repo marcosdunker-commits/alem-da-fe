@@ -62,6 +62,8 @@ _secret = os.getenv("SECRET_KEY")
 if not _secret:
     raise RuntimeError("SECRET_KEY não definida no .env")
 app.secret_key = _secret
+app.config["PERMANENT_SESSION_LIFETIME"] = __import__("datetime").timedelta(days=30)
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 def _ler_versao():
     try:
@@ -234,6 +236,7 @@ def entrar():
     dados = request.get_json()
     usuario = fazer_login(dados.get("email", ""), dados.get("senha", ""))
     if usuario:
+        session.permanent = True
         session["usuario_id"] = usuario["id"]
         session["usuario_nome"] = usuario["nome"]
         session["usuario_plano"] = usuario["plano"]

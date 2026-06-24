@@ -286,40 +286,27 @@ function ativarIOS() {
     btn.textContent = 'Aguardando permissão...';
     btn.disabled = true;
 
-    function onPermission(e) {
-        window.removeEventListener('push-permission-request', onPermission);
-        if (e.detail === 'granted') {
-            window.addEventListener('push-token', onToken);
-            window.location.href = 'alemdafe://push-token';
-        } else {
-            btn.textContent = 'Ativar notificações';
-            btn.disabled = false;
-            mostrarMsg('Permissão negada. Habilite em Configurações → Além da Fé → Notificações.', 'err');
-        }
-    }
-
-    function onToken(e) {
-        window.removeEventListener('push-token', onToken);
-        const token = e.detail;
-        if (!token || token === 'ERROR GET TOKEN') {
-            btn.textContent = 'Ativar notificações';
-            btn.disabled = false;
-            mostrarMsg('Erro ao obter token. Tente reinstalar o app.', 'err');
-            return;
-        }
-        fetch('/subscribe-push-ios', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token })
-        }).then(r => r.json()).then(d => {
-            if (d.ok) {
+    let tentativas = 0;
+    const poll = setInterval(async () => {
+        tentativas++;
+        try {
+            const r = await fetch('/status-push-ios');
+            const d = await r.json();
+            if (d.ativo) {
+                clearInterval(poll);
                 setAtivo(true);
                 mostrarMsg('Notificações ativadas! Você receberá sua mensagem bíblica diária.', 'ok');
+                return;
             }
-        }).catch(() => mostrarMsg('Erro ao salvar. Tente novamente.', 'err'));
-    }
+        } catch(e) {}
+        if (tentativas >= 15) {
+            clearInterval(poll);
+            btn.textContent = 'Ativar notificações';
+            btn.disabled = false;
+            mostrarMsg('Permissão negada ou não concedida. Verifique Configurações → Além da Fé → Notificações.', 'err');
+        }
+    }, 2000);
 
-    window.addEventListener('push-permission-request', onPermission);
     window.location.href = 'alemdafe://push-permission-request';
 }
 
