@@ -311,7 +311,11 @@ function ativarIOS() {
         }
     }, 2000);
 
-    window.location.href = 'alemdafe://push-permission-request';
+    const fr = document.createElement('iframe');
+    fr.style.display = 'none';
+    fr.src = 'alemdafe://push-permission-request';
+    document.body.appendChild(fr);
+    setTimeout(() => fr.remove(), 1000);
 }
 
 async function desativar() {
