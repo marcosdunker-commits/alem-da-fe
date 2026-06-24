@@ -116,7 +116,7 @@
 
         <div id="area-ativar">
             <button class="btn-ativar" id="btn-ativar" onclick="ativar()">Ativar notificações</button>
-            <p class="aviso-notif">Você precisará permitir notificações no seu navegador.</p>
+            <p class="aviso-notif" id="aviso-notif">Você precisará permitir notificações no seu navegador.</p>
         </div>
         <div id="area-ativo" style="display:none;">
             <button class="btn-desativar" onclick="desativar()">Desativar notificações</button>
@@ -199,6 +199,10 @@
 const VAPID_PUBLIC_KEY = '{{ vapid_public_key }}';
 const PLANO = '{{ plano }}';
 const IS_IOS_APP = navigator.userAgent.includes('PWAShell');
+if (IS_IOS_APP) {
+    const aviso = document.getElementById('aviso-notif');
+    if (aviso) aviso.textContent = 'Ao clicar, o iPhone pedirá permissão para enviar notificações.';
+}
 
 function urlBase64ToUint8Array(b64) {
     const pad = '='.repeat((4 - b64.length % 4) % 4);
